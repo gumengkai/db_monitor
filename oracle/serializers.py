@@ -99,6 +99,52 @@ class OracleRedoSwitchSerializer(serializers.Serializer):
     STAT_DATE = serializers.CharField()
     LOG_COUNT = serializers.IntegerField()
 
+class OracleTopSegmentSerializer(serializers.Serializer):
+    OWNER = serializers.CharField()
+    SEGMENT_NAME = serializers.CharField()
+    PARTITION_NAME = serializers.CharField()
+    SEGMENT_TYPE = serializers.CharField()
+    TABLESPACE_NAME = serializers.CharField()
+    SEGMENT_SIZE = serializers.FloatField()
+    RN = serializers.IntegerField()
+
+class OracleSequenceUsedSerializer(serializers.Serializer):
+    SEQUENCE_OWNER = serializers.CharField()
+    SEQUENCE_NAME = serializers.CharField()
+    MIN_VALUE = serializers.IntegerField()
+    MAX_VALUE = serializers.CharField()
+    INCREMENT_BY = serializers.IntegerField()
+    CYCLE_FLAG = serializers.CharField()
+    ORDER_FLAG = serializers.CharField()
+    CACHE_SIZE = serializers.IntegerField()
+    LAST_NUMBER = serializers.IntegerField()
+
+class OracleUserSerializer(serializers.Serializer):
+    USERNAME = serializers.CharField()
+    PROFILE = serializers.CharField()
+    CREATED = serializers.CharField()
+    ACCOUNT_STATUS = serializers.CharField()
+    LOCK_DATE = serializers.CharField()
+    EXPIRY_DATE = serializers.CharField()
+    DEFAULT_TABLESPACE = serializers.CharField()
+    TEMPORARY_TABLESPACE = serializers.CharField()
+
+class OracleProfileSerializer(serializers.Serializer):
+    PROFILE = serializers.CharField()
+    RESOURCE_NAME = serializers.CharField()
+    RESOURCE_TYPE = serializers.CharField()
+    LIMIT = serializers.CharField()
+
+class OracleUserRoleSerializer(serializers.Serializer):
+    GRANTEE = serializers.CharField()
+    GRANTED_ROLE = serializers.CharField()
+    ADMIN_OPTION = serializers.CharField()
+
+class OracleUserGrantSerializer(serializers.Serializer):
+    GRANTEE = serializers.CharField()
+    PRIVILEGE = serializers.CharField()
+    ADMIN_OPTION = serializers.CharField()
+
 class OracleActiveSession(serializers.Serializer):
     LOGON_TIME = serializers.CharField()
     SID = serializers.IntegerField()

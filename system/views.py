@@ -198,38 +198,7 @@ class Menu(APIView):
                         'meta': {
                             'access': ['system.view_alarmconf'],
                             'icon': 'ios-menu',
-                            'title': '告警管理'
-                        },
-                        'component': 'system/alarm-conf'
-                    }
-                ]
-            },
-            {
-                "path": '/settings',
-                "name": 'settings',
-                "meta": {
-                    "icon": 'ios-settings',
-                    "title": '配置管理'
-                },
-                "component": 'Main',
-                "children": [
-                    {
-                        'path': 'alarm-info',
-                        'name': 'alarm-info',
-                        'meta': {
-                            'access': ['system.view_alarminfo'],
-                            'icon': 'ios-menu',
-                            'title': '采集配置'
-                        },
-                        'component': 'system/alarm-info'
-                    },
-                    {
-                        'path': 'alarm-conf',
-                        'name': 'alarm-conf',
-                        'meta': {
-                            'access': ['system.view_alarmconf'],
-                            'icon': 'ios-menu',
-                            'title': '邮件配置'
+                            'title': '告警配置'
                         },
                         'component': 'system/alarm-conf'
                     }

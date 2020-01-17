@@ -272,6 +272,101 @@ def ApiOracleRedoLogSwitch(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+def ApiOracleTopSegment(request):
+    tags = request.GET.get('tags')
+    oracle_params = get_oracle_params(tags)
+    sql = '''
+    select *
+  from (select a.owner,
+               a.segment_name,
+               a.partition_name,
+               a.segment_type,
+               a.tablespace_name,
+               a.bytes / 1024 / 1024  segment_size,
+               row_number() over(order by a.bytes desc) RN
+          from dba_segments a)
+ where rn <= 50
+    '''
+    top_segment_list = OracleBase(oracle_params).django_query(sql)
+    serializer = OracleTopSegmentSerializer(top_segment_list,many=True)
+    json = JSONRenderer().render(serializer.data)
+    return HttpResponse(json)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def ApiOracleSequenceUsed(request):
+    tags = request.GET.get('tags')
+    oracle_params = get_oracle_params(tags)
+    sql = '''select sequence_owner,sequence_name,min_value,max_value,increment_by,cycle_flag,order_flag,
+       cache_size,last_number,
+       round((max_value - last_number) / (max_value - min_value), 2) * 100 pct_used
+  from dba_sequences s
+ where s.sequence_owner not in ('SYS','SYSTEM','OUTLN','DIP','ORACLE_OCM','DBSNMP','APPQOSSYS','WMSYS','EXFSYS',
+'CTXSYS','ANONYMOUS','XDB','XS$NULL','ORDDATA','SI_INFORMTN_SCHEMA','ORDPLUGINS','ORDSYS','MDSYS','OLAPSYS',
+'MDDATA','SPATIAL_WFS_ADMIN_USR','SPATIAL_CSW_ADMIN_USR','SYSMAN','MGMT_VIEW','APEX_030200','FLOWS_FILES',
+'APEX_PUBLIC_USER','OWBSYS','OWBSYS_AUDIT','SCOTT') '''
+    sequence_used_list = OracleBase(oracle_params).django_query(sql)
+    serializer = OracleSequenceUsedSerializer(sequence_used_list,many=True)
+    json = JSONRenderer().render(serializer.data)
+    return HttpResponse(json)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def ApiOracleUser(request):
+    tags = request.GET.get('tags')
+    oracle_params = get_oracle_params(tags)
+    sql = '''select username,profile,to_char(created,'yyyy-mm-dd hh24:mi:ss') created,
+                   account_status,
+                   to_char(lock_date,'yyyy-mm-dd hh24:mi:ss') lock_date,
+                   to_char(expiry_date,'yyyy-mm-dd hh24:mi:ss') expiry_date,
+                   default_tablespace,temporary_tablespace
+            from dba_users order by created desc '''
+    user_list = OracleBase(oracle_params).django_query(sql)
+    serializer = OracleUserSerializer(user_list,many=True)
+    json = JSONRenderer().render(serializer.data)
+    return HttpResponse(json)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def ApiOracleProfile(request):
+    tags = request.GET.get('tags')
+    profile = request.GET.get('profile')
+    oracle_params = get_oracle_params(tags)
+    sql = """
+                select profile,resource_name,resource_type,limit
+                  from dba_profiles where  profile = '{}'
+                """.format(profile)
+    profile_list = OracleBase(oracle_params).django_query(sql)
+    serializer = OracleProfileSerializer(profile_list,many=True)
+    json = JSONRenderer().render(serializer.data)
+    return HttpResponse(json)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def ApiOracleUserRole(request):
+    tags = request.GET.get('tags')
+    user = request.GET.get('user')
+    oracle_params = get_oracle_params(tags)
+    sql = "select grantee,granted_role, admin_option,default_role from dba_role_privs where grantee = '{}' ".format(user)
+    role_list = OracleBase(oracle_params).django_query(sql)
+    serializer = OracleUserRoleSerializer(role_list,many=True)
+    json = JSONRenderer().render(serializer.data)
+    return HttpResponse(json)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def ApiOracleUserGrant(request):
+    tags = request.GET.get('tags')
+    user = request.GET.get('user')
+    oracle_params = get_oracle_params(tags)
+    sql = "select grantee,privilege,admin_option from dba_sys_privs where grantee = '{}' ".format(user)
+    grant_list = OracleBase(oracle_params).django_query(sql)
+    serializer = OracleUserGrantSerializer(grant_list,many=True)
+    json = JSONRenderer().render(serializer.data)
+    return HttpResponse(json)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def ApiOracleActiveSession(request):
     tags = request.GET.get('tags')
     oracle_params = get_oracle_params(tags)
@@ -356,6 +451,8 @@ def ApiOracleSessionCount(request):
     select a.status,count(*) cnt from v$session a where a.type='USER' group by a.status
     '''
     session_all = OracleBase(oracle_params).django_query(sql)
+    active_session_count = 0
+    inactive_session_count = 0
     for each in session_all:
         if each['STATUS'] == 'ACTIVE':
             active_session_count = each['CNT']

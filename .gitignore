@@ -5,12 +5,15 @@
 */*.pyc
 *.DS_Store
 *.idea
+*.vscode
 *.git
 */.DS_Store
 */.idea
 */__pycache__
 */__pycache__/*
 *.log
+
+.vscode
 
 /webssh
 /frontend
