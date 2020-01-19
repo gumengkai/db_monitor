@@ -1,10 +1,10 @@
 
 # DB monitor数据库监控平台
 
-![](https://img.shields.io/badge/build-release-brightgreen.svg)  
-![](https://img.shields.io/badge/version-v1.0.0-brightgreen.svg)  
-![](https://img.shields.io/badge/vue.js-2.9.6-brightgreen.svg) 
-![](https://img.shields.io/badge/iview-3.4.0-brightgreen.svg?style=flat-square) 
+![](https://img.shields.io/badge/build-release-brightgreen.svg)
+![](https://img.shields.io/badge/version-v1.0.0-brightgreen.svg)
+![](https://img.shields.io/badge/vue.js-2.9.6-brightgreen.svg)
+![](https://img.shields.io/badge/iview-3.4.0-brightgreen.svg?style=flat-square)
 ![](https://img.shields.io/badge/python-3.6-brightgreen.svg)
 ![](https://img.shields.io/badge/Django-2.2-brightgreen.svg)
 
@@ -31,7 +31,7 @@
     - iview 3.4
 
 ## 平台使用
-- [在线访问](http://122.51.204.250:8080/) (下表为登录的用户/密码)
+- [在线访问](http://122.51.204.250:8080/) (推荐使用chrome浏览器访问)
   
 用户名：admin 
 密码：111111
@@ -59,17 +59,20 @@ pip install -r requirements.txt
 
 ##### setting配置
 MySQL数据库：
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
-        'NAME': 'db_monitor',
-        'USER': 'root',
-        'PASSWORD': 'mysqld',
+
+DATABASES = {  
+    'default': {  
+        'ENGINE': 'django.db.backends.mysql',  
+		'NAME': 'db_monitor',  
+		'USER': 'root',  
+		'PASSWORD': 'mysqld',  
+        'HOST':'127.0.0.1',  
+		'PORT': '3306',  
     }
 }
+
 Redis：
+
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
 CELERY_BROKER_URL = 'redis://localhost:6379/2'
 
@@ -86,7 +89,9 @@ python manage.py createsuperuser(创建登录用户)
 
 #### 6. 启动
 python manage.py runserver
+
 celery –A db_monitor worker –l info
+
 celery –A db_monitor beat –l info
 
 #### 7. 前端配置
