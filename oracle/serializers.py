@@ -187,3 +187,17 @@ class OracleBlockingSession(serializers.Serializer):
     OWNER = serializers.CharField()
     OBJECT_NAME = serializers.CharField()
     OBJECT_TYPE = serializers.CharField()
+
+class OracleTopSql(serializers.Serializer):
+    COL1 = serializers.CharField()
+    COL2 = serializers.CharField()
+    COL3 = serializers.CharField()
+    COL4 = serializers.CharField()
+    COL5 = serializers.CharField()
+    COL6 = serializers.CharField()
+    COL7 = serializers.CharField()
+    COL8 = serializers.CharField()
+    COL9 = serializers.CharField()
+    COL10 = serializers.CharField()
+    COL11 = serializers.CharField()
+    COL12 = serializers.CharField()

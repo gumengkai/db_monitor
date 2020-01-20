@@ -98,6 +98,11 @@ celery –A db_monitor beat –l info
 #### 7. 前端配置
 请参考：[db_monitor_vue](https://github.com/gumengkai/db_monitor_vue)
 
+#### 8. oracle数据库监控
+对Oracle数据库监控，请在被监控端建立用户，并执行install/sqlscripts(forOracle)中的脚本
+
+grant.sql & table.sql & procedure.sql
+
 ## 界面展示
 
 - 资产管理
@@ -107,6 +112,10 @@ celery –A db_monitor beat –l info
 - Oracle数据库概览
 
 ![demo1](images/demo2.jpg)
+
+- oracle top sql
+
+![demo1](images/demo6.jpg)
 
 - MySQL数据库日志解析
 
@@ -119,6 +128,7 @@ celery –A db_monitor beat –l info
 - 告警配置
 
 ![demo1](images/demo5.jpg)
+
 
 ## 交流学习
 - QQ群 916746047

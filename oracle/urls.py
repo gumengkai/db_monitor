@@ -32,5 +32,6 @@ urlpatterns = [
     path('api/oracle-controlfile', views.ApiOracleControlFile.as_view()),
     path('api/oracle-redolog', views.ApiOracleRedoLog.as_view()),
     path('api/oracle-redolog-switch', views.ApiOracleRedoLogSwitch),
+    path('api/oracle-top-sql', views.ApiOracleTopSql),
 ]
 

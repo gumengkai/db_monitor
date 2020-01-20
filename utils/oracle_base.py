@@ -70,6 +70,15 @@ class OracleBase(object):
         except Exception as e:
             print('oracle query error:{}'.format(e))
 
+    def call_proc(self,proc,db_conn=None):
+        if not db_conn:
+            db_conn = self.connection()
+        try:
+            cursor = db_conn.cursor()
+            cursor.callproc(proc)
+            cursor.close()
+        except Exception as e:
+            print('oracle query error:{}'.format(e))
 
 def get_connection(params):
     host = params['host']

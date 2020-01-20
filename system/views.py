@@ -285,6 +285,16 @@ class Menu(APIView):
                         'component': 'oracle/performance'
                     },
                     {
+                        'path': ':tags/top-sql',
+                        'name': 'oracle-top-sql',
+                        'meta': {
+                            'hideInMenu': 'true',
+                            'title': 'TOP SQL',
+                            'access': ['oracle.view_oraclestat'],
+                        },
+                        'component': 'oracle/top-sql'
+                    },
+                    {
                         'path': ':tags/alert-log',
                         'name': 'oracle-alertlog',
                         'meta': {

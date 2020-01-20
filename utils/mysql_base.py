@@ -15,16 +15,10 @@ class MysqlBase(object):
             'charset': 'utf8'
         }
 
-    @classmethod
-    def convert_params(cls,params):
-        params['port'] = int(params.get('port', 0))
-        return params
-
     def connection(self):
-        self.params = self.convert_params(self.params)
         self.params.update(self.conn_conf)
         try:
-            conn = pymysql.connect(host=self.host,port=self.port,user=self.user,password=self.password,db=self.db)
+            conn = pymysql.connect(host=self.host,port=int(self.port),user=self.user,password=self.password,db=self.db)
             return conn
         except Exception as e:
             print('mysql connect error:{}'.format(e))

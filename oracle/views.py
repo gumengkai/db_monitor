@@ -478,3 +478,34 @@ def ApiOracleBlockCount(request):
 
     block_count_data = {'ROW_LOCK':row_lock_count,'ALL':all_block_count}
     return HttpResponse(json.dumps(block_count_data))
+
+
+class MyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, bytes):
+            return str(obj, encoding='utf-8')
+        return json.JSONEncoder.default(self, obj)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def ApiOracleTopSql(request):
+    tags = request.GET.get('tags')
+    type = request.GET.get('type')
+    oracle_params = get_oracle_params(tags)
+    dic_proc = {
+        'cpu':'pro_top_cpu_sql',
+        'phys':'pro_top_phys_sql',
+        'logic':'pro_top_logic_sql'
+    }
+    proc_name = dic_proc.get(type)
+    db_conn = OracleBase(oracle_params).connection()
+    OracleBase(oracle_params).call_proc(proc_name, db_conn)
+    sql = "select COL1,COL2,COL3,COL4,COL5,COL6,COL7,COL8,COL9,COL10,COL11,COL12 from snap_show_config " \
+          "union all " \
+          "select RATE,SQL_ID,SQL_EXEC_CNT,VAL1,VAL2,VAL3,VAL4,VAL5,VAL6,VAL7,VAL8,VAL9 from snap_show"
+    res = OracleBase(oracle_params).django_query(sql, db_conn)
+    serializer = OracleTopSql(res, many=True)
+    snap_json = JSONRenderer().render(serializer.data)
+    return HttpResponse(snap_json)
