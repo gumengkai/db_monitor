@@ -70,7 +70,7 @@ class MysqlStat(models.Model):
     innodb_data_fsyncs = models.IntegerField("数据刷新次数",blank=True,null=True)
     innodb_os_log_written = models.FloatField("innodb写入redo log的字节数",blank=True,null=True)
     status = models.IntegerField("数据库连接状态 0成功 1失败",blank=True, null=True)
-    check_time = models.DateTimeField("采集时间",default=timezone.now(),blank=True, null=True)
+    check_time = models.DateTimeField("采集时间",default=timezone.now,blank=True, null=True)
 
     def __str__(self):
         return self.tags
@@ -93,7 +93,7 @@ class MysqlSlowquery(models.Model):
     rows_examined = models.IntegerField("扫描行数",blank=True, null=True)
     rows_sent = models.IntegerField("返回客户端行数",blank=True, null=True)
     thread_id = models.CharField("线程号",max_length=64)
-    check_time = models.DateTimeField("采集时间",default=timezone.now(),blank=True, null=True)
+    check_time = models.DateTimeField("采集时间",default=timezone.now,blank=True, null=True)
 
     def __str__(self):
         return self.tags
@@ -173,7 +173,7 @@ class MysqlStatHis(models.Model):
     innodb_data_fsyncs = models.IntegerField("数据刷新次数",blank=True,null=True)
     innodb_os_log_written = models.FloatField("innodb写入redo log的字节数",blank=True,null=True)
     status = models.IntegerField("数据库连接状态 0成功 1失败",blank=True, null=True)
-    check_time = models.DateTimeField("采集时间",default=timezone.now(),blank=True, null=True)
+    check_time = models.DateTimeField("采集时间",default=timezone.now,blank=True, null=True)
 
     def __str__(self):
         return self.tags

@@ -34,7 +34,7 @@ class RedisStat(models.Model):
     cmdstat_exec = models.FloatField(blank=True, null=True)
     cmdstat_multi = models.FloatField(blank=True, null=True)
     status = models.IntegerField("数据库连接状态 0成功 1失败",blank=True, null=True)
-    check_time = models.DateTimeField("采集时间",default=timezone.now(),blank=True, null=True)
+    check_time = models.DateTimeField("采集时间",default=timezone.now,blank=True, null=True)
 
     def __str__(self):
         return self.tags
@@ -75,7 +75,7 @@ class RedisStatHis(models.Model):
     cmdstat_exec = models.FloatField(blank=True, null=True)
     cmdstat_multi = models.FloatField(blank=True, null=True)
     status = models.IntegerField("数据库连接状态 0成功 1失败",blank=True, null=True)
-    check_time = models.DateTimeField("采集时间",default=timezone.now(),blank=True, null=True)
+    check_time = models.DateTimeField("采集时间",default=timezone.now,blank=True, null=True)
 
     def __str__(self):
         return self.tags

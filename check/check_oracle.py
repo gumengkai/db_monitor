@@ -4,7 +4,7 @@ import check.checklog as checklog
 from .oracle_info import *
 from utils.oracle_base import OracleBase
 from check.oracle_stat import OracleStat
-from utils.tools import mysql_exec,now,clear_table,archive_table
+from utils.tools import *
 from check.oracle_logparser import get_oracle_alert
 import time
 from datetime import datetime

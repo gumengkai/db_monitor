@@ -54,7 +54,7 @@ class LinuxStat(models.Model):
     ctx = models.FloatField(blank=True, null=True)
     softirq = models.FloatField(blank=True, null=True)
     status = models.IntegerField("linux主机连接状态 0成功 1失败",blank=True, null=True)
-    check_time = models.DateTimeField("采集时间",default=timezone.now(),blank=True,null=True)
+    check_time = models.DateTimeField("采集时间",default=timezone.now,blank=True,null=True)
 
     def __str__(self):
         return self.tags
@@ -74,7 +74,7 @@ class LinuxDisk(models.Model):
     free_size = models.FloatField("剩余空间大小",blank=True,null=True)
     used_percent = models.FloatField("使用率",blank=True,null=True)
     mount_point = models.CharField("挂载点",max_length=256,blank=True,null=True)
-    check_time = models.DateTimeField("采集时间",default=timezone.now(),blank=True,null=True)
+    check_time = models.DateTimeField("采集时间",default=timezone.now,blank=True,null=True)
 
     def __str__(self):
         return self.tags
@@ -105,7 +105,7 @@ class LinuxIoStat(models.Model):
     io_s = models.FloatField("物理磁盘吞吐量",blank=True, null=True)
     qtime = models.FloatField("IO请求队列时间(平均排队时间)",blank=True, null=True)
     stime = models.FloatField("IO请求服务时间",blank=True, null=True)
-    check_time = models.DateTimeField("采集时间",default=timezone.now(),blank=True,null=True)
+    check_time = models.DateTimeField("采集时间",default=timezone.now,blank=True,null=True)
 
     def __str__(self):
         return self.tags
@@ -168,7 +168,7 @@ class LinuxStatHis(models.Model):
     ctx = models.FloatField(blank=True, null=True)
     softirq = models.FloatField(blank=True, null=True)
     status = models.IntegerField("linux主机连接状态 0成功 1失败",blank=True, null=True)
-    check_time = models.DateTimeField("采集时间",default=timezone.now(),blank=True,null=True)
+    check_time = models.DateTimeField("采集时间",default=timezone.now,blank=True,null=True)
 
     def __str__(self):
         return self.tags
@@ -188,7 +188,7 @@ class LinuxDiskHis(models.Model):
     free_size = models.FloatField("剩余空间大小",blank=True,null=True)
     used_percent = models.FloatField("使用率",blank=True,null=True)
     mount_point = models.CharField("挂载点",max_length=256,blank=True,null=True)
-    check_time = models.DateTimeField("采集时间",default=timezone.now(),blank=True,null=True)
+    check_time = models.DateTimeField("采集时间",default=timezone.now,blank=True,null=True)
 
     def __str__(self):
         return self.tags
@@ -219,7 +219,7 @@ class LinuxIoStatHis(models.Model):
     io_s = models.FloatField("物理磁盘吞吐量",blank=True, null=True)
     qtime = models.FloatField("IO请求队列时间(平均排队时间)",blank=True, null=True)
     stime = models.FloatField("IO请求服务时间",blank=True, null=True)
-    check_time = models.DateTimeField("采集时间",default=timezone.now(),blank=True,null=True)
+    check_time = models.DateTimeField("采集时间",default=timezone.now,blank=True,null=True)
 
     def __str__(self):
         return self.tags

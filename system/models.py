@@ -29,7 +29,7 @@ class AlertLog(models.Model):
     log_time = models.CharField("日志时间",max_length=255)
     log_level = models.CharField("日志级别",max_length=16,choices=LOG_LEVEL)
     log_content = models.TextField("日志内容")
-    check_time = models.DateTimeField("采集时间",default=timezone.now(),blank=True, null=True)
+    check_time = models.DateTimeField("采集时间",default=timezone.now,blank=True, null=True)
 
     def __str__(self):
         return self.tags
