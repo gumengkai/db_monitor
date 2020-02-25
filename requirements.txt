@@ -11,7 +11,7 @@ coreapi==2.3.3
 coreschema==0.0.4
 cryptography==2.7
 cx-Oracle==7.2.2
-Django==2.2.8
+Django==2.2.10
 django-bootstrap3==11.1.0
 django-celery-beat==1.5.0
 django-celery-results==1.1.2
