@@ -18,7 +18,6 @@
 /webssh
 /frontend
 /static
-/templates
 /venv
 
 configure.yaml

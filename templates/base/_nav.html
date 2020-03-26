@@ -1,0 +1,79 @@
+{% load static %}
+    <nav class="navbar-default navbar-static-side" role="navigation">
+        <div class="sidebar-collapse">
+            <ul class="nav metismenu" id="side-menu">
+                <li class="nav-header">
+                    <div class="dropdown profile-element">
+                        <img alt="image" class="rounded-circle" src="{% static "img/profile_small.jpg" %}"/>
+                        <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                            <span class="block m-t-xs font-bold">ADMIN</span>
+                            <span class="text-muted text-xs block">管理员 <b class="caret"></b></span>
+                        </a>
+                        <ul class="dropdown-menu animated fadeInRight m-t-xs">
+                            <li><a class="dropdown-item" href="profile.html">个人信息</a></li>
+                            <li><a class="dropdown-item" href="contacts.html">好友</a></li>
+                            <li><a class="dropdown-item" href="mailbox.html">信箱</a></li>
+                            <li class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="login.html">登出</a></li>
+                        </ul>
+                    </div>
+                    <div class="logo-element">
+                        IN+
+                    </div>
+                </li>
+                <li>
+                    <a href="index.html"><i class="fa fa-pie-chart"></i> <span class="nav-label">评分板</span> <span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level collapse">
+                        <li><a href="index.html">Oracle</a></li>
+                        <li><a href="dashboard_2.html">MySQL</a></li>
+                        <li><a href="dashboard_3.html">Linux</a></li>
+                        <li><a href="dashboard_4_1.html">Redis</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#"><i class="fa fa-database"></i> <span class="nav-label">Oracle</span><span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level collapse">
+                        <li><a href="table_basic.html">静态表格</a></li>
+                        <li><a href="table_data_tables.html">数据表格</a></li>
+                        <li><a href="table_foo_table.html">Foo 表格</a></li>
+                        <li><a href="jq_grid.html">jqGrid</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#"><i class="fa fa-cubes"></i> <span class="nav-label">MySQL</span><span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level collapse">
+                        <li><a href="table_basic.html">静态表格</a></li>
+                        <li><a href="table_data_tables.html">数据表格</a></li>
+                        <li><a href="table_foo_table.html">Foo 表格</a></li>
+                        <li><a href="jq_grid.html">jqGrid</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#"><i class="fa fa-tasks"></i> <span class="nav-label">Redis</span><span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level collapse">
+                        <li><a href="table_basic.html">静态表格</a></li>
+                        <li><a href="table_data_tables.html">数据表格</a></li>
+                        <li><a href="table_foo_table.html">Foo 表格</a></li>
+                        <li><a href="jq_grid.html">jqGrid</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#"><i class="fa fa-linux"></i> <span class="nav-label">Linux</span><span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level collapse">
+                        <li><a href="table_basic.html">静态表格</a></li>
+                        <li><a href="table_data_tables.html">数据表格</a></li>
+                        <li><a href="table_foo_table.html">Foo 表格</a></li>
+                        <li><a href="jq_grid.html">jqGrid</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#"><i class="fa fa-gears"></i> <span class="nav-label">配置管理</span><span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level collapse">
+                        <li><a href="table_basic.html">监控接入</a></li>
+                        <li><a href="table_data_tables.html">告警策略</a></li>
+                    </ul>
+                </li>
+            </ul>
+
+        </div>
+    </nav>

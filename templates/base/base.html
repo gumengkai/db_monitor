@@ -1,0 +1,30 @@
+{% load staticfiles %}
+{% load static %}
+{% load bootstrap3 %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %} {% endblock%}</title>
+    {% include "base/_css.html" %}
+    {% block header_css %}{% endblock %}
+</head>
+
+<div id="wapper">
+{% include "base/_nav.html" %}
+    <div id="page-wrapper" class="gray-bg">
+
+     {% include "base/_navbar-top.html" %}
+
+    {% block content %}
+    {% endblock %}
+
+    {% include "base/_footer.html" %}
+    </div>
+</div>
+
+{% include "base/_js.html" %}
