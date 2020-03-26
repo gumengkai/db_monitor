@@ -1,5 +1,6 @@
 # encoding:utf-8
 
+from django.shortcuts import render_to_response
 from .models import *
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import permissions
@@ -15,6 +16,8 @@ import json
 from utils.tools import *
 from utils.django_tools import NoPagination
 from utils.oracle_base import OracleBase
+import datetime
+from oracle.tasks import create_oracle_report
 
 # not using
 class OraclestatFilter(dfilters.FilterSet):
@@ -405,7 +408,7 @@ def ApiOracleActiveSession(request):
    and a.row_wait_obj# = c.object_id(+)
    and a.type = 'USER' '''
     active_session_list = OracleBase(oracle_params).django_query(sql)
-    serializer = OracleActiveSession(active_session_list,many=True)
+    serializer = OracleActiveSessionSerializer(active_session_list,many=True)
     json = JSONRenderer().render(serializer.data)
     return HttpResponse(json)
 
@@ -438,7 +441,7 @@ def ApiOracleBlockingSession(request):
    and a.row_wait_obj# = c.object_id(+)
     '''
     blocking_session_list = OracleBase(oracle_params).django_query(sql)
-    serializer = OracleBlockingSession(blocking_session_list,many=True)
+    serializer = OracleBlockingSessionSerializer(blocking_session_list,many=True)
     json = JSONRenderer().render(serializer.data)
     return HttpResponse(json)
 
@@ -479,15 +482,6 @@ def ApiOracleBlockCount(request):
     block_count_data = {'ROW_LOCK':row_lock_count,'ALL':all_block_count}
     return HttpResponse(json.dumps(block_count_data))
 
-
-class MyEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, np.ndarray):
-            return obj.tolist()
-        elif isinstance(obj, bytes):
-            return str(obj, encoding='utf-8')
-        return json.JSONEncoder.default(self, obj)
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def ApiOracleTopSql(request):
@@ -506,6 +500,76 @@ def ApiOracleTopSql(request):
           "union all " \
           "select RATE,SQL_ID,SQL_EXEC_CNT,VAL1,VAL2,VAL3,VAL4,VAL5,VAL6,VAL7,VAL8,VAL9 from snap_show"
     res = OracleBase(oracle_params).django_query(sql, db_conn)
-    serializer = OracleTopSql(res, many=True)
+    serializer = OracleTopSqlSerializer(res, many=True)
     snap_json = JSONRenderer().render(serializer.data)
     return HttpResponse(snap_json)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def ApiOracleSnapList(request):
+    tags = request.GET.get('tags')
+    oracle_params = get_oracle_params(tags)
+    start_time = request.query_params.get('start_time', None)
+    end_time = request.query_params.get('end_time', None)
+
+    if not (start_time and end_time):
+        # default data of 1 day
+        end_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        start_time = (datetime.datetime.now() + datetime.timedelta(days=-1)).strftime('%Y-%m-%d %H:%M:%S')
+
+    sql = """
+               SELECT dbid,
+                  to_char(s.startup_time, 'yyyy-mm-dd hh24:mi:ss') snap_startup_time,
+                  to_char(s.begin_interval_time,
+                          'yyyy-mm-dd hh24:mi:ss') begin_interval_time,
+                  to_char(s.end_interval_time, 'yyyy-mm-dd hh24:mi:ss') end_interval_time,
+                  s.snap_id, s.instance_number,
+                  (cast(s.end_interval_time as date) - cast(s.begin_interval_time as date))*86400 as span_in_second
+               from dba_hist_snapshot  s, v$instance b
+               where s.end_interval_time >= to_date('{}','yyyy-mm-dd hh24:mi:ss') and s.end_interval_time <= to_date('{}','yyyy-mm-dd hh24:mi:ss')
+               and s.INSTANCE_NUMBER = b.INSTANCE_NUMBER order by snap_id
+           """.format(start_time,end_time)
+
+    snap_list = OracleBase(oracle_params).django_query(sql)
+    serializer = OracleSnapListSerializer(snap_list,many=True)
+    json = JSONRenderer().render(serializer.data)
+    return HttpResponse(json)
+
+class ApiOracleReportList(generics.ListCreateAPIView):
+    queryset = OracleReport.objects.get_queryset().order_by('-create_time')
+    serializer_class = OracleReportSerializer
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
+    filter_fields = ('tags', 'report_type')
+    search_fields = ('tags', 'report_type')
+    permission_classes = (permissions.DjangoModelPermissions,)
+
+class ApiOracleReportDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = OracleReport.objects.get_queryset().order_by('id')
+    serializer_class = OracleReportSerializer
+    permission_classes = (permissions.DjangoModelPermissions,)
+
+def show_report(request):
+    report_path = request.GET.get('report_path')
+    if 'txt' in report_path:
+        local_file = os.getcwd() + '/templates/' + report_path
+        print(local_file)
+        txt_data = open(local_file, "r")
+        content = txt_data.readlines()
+        return render_to_response('show_txt.html', {'content':content})
+    else:
+        return render_to_response(report_path)
+
+@api_view(['POST'])
+def ApiOracleCreateReport(request):
+    postBody = request.body
+    json_result = json.loads(postBody)
+    tags = json_result.get('tags')
+    begin_snap = json_result.get('begin_snap')
+    end_snap = json_result.get('end_snap')
+    report_type = json_result.get('report_type')
+    oracle_params = get_oracle_params(tags)
+    print(begin_snap)
+    print(end_snap)
+    print(type(begin_snap))
+    create_oracle_report.delay(tags,oracle_params,report_type,begin_snap,end_snap)
+    return HttpResponse('success!')

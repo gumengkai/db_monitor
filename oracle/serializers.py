@@ -145,7 +145,7 @@ class OracleUserGrantSerializer(serializers.Serializer):
     PRIVILEGE = serializers.CharField()
     ADMIN_OPTION = serializers.CharField()
 
-class OracleActiveSession(serializers.Serializer):
+class OracleActiveSessionSerializer(serializers.Serializer):
     LOGON_TIME = serializers.CharField()
     SID = serializers.IntegerField()
     SQL_ID = serializers.CharField()
@@ -172,7 +172,7 @@ class OracleActiveSession(serializers.Serializer):
     KILLSTR = serializers.CharField()
     KILL_SH = serializers.CharField()
 
-class OracleBlockingSession(serializers.Serializer):
+class OracleBlockingSessionSerializer(serializers.Serializer):
     LOGON_TIME = serializers.CharField()
     SID = serializers.IntegerField()
     SQL_ID = serializers.CharField()
@@ -188,7 +188,7 @@ class OracleBlockingSession(serializers.Serializer):
     OBJECT_NAME = serializers.CharField()
     OBJECT_TYPE = serializers.CharField()
 
-class OracleTopSql(serializers.Serializer):
+class OracleTopSqlSerializer(serializers.Serializer):
     COL1 = serializers.CharField()
     COL2 = serializers.CharField()
     COL3 = serializers.CharField()
@@ -201,3 +201,16 @@ class OracleTopSql(serializers.Serializer):
     COL10 = serializers.CharField()
     COL11 = serializers.CharField()
     COL12 = serializers.CharField()
+
+class OracleSnapListSerializer(serializers.Serializer):
+    DBID = serializers.IntegerField()
+    SNAP_STARTUP_TIME = serializers.CharField()
+    BEGIN_INTERVAL_TIME = serializers.CharField()
+    END_INTERVAL_TIME = serializers.CharField()
+    SNAP_ID = serializers.CharField()
+    INSTANCE_NUMBER = serializers.CharField()
+
+class OracleReportSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OracleReport
+        fields = '__all__'

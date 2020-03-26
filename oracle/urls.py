@@ -4,6 +4,7 @@ from oracle import views
 app_name = "oracle"
 
 urlpatterns = [
+    path('show_report', views.show_report),
     path('api/oracle-stat-list', views.ApiOracleStatList.as_view()),
     path('api/oracle-stat', views.ApiOracleStat.as_view()),
     path('api/oracle-stat-his', views.ApiOracleStatHis.as_view()),
@@ -33,5 +34,9 @@ urlpatterns = [
     path('api/oracle-redolog', views.ApiOracleRedoLog.as_view()),
     path('api/oracle-redolog-switch', views.ApiOracleRedoLogSwitch),
     path('api/oracle-top-sql', views.ApiOracleTopSql),
+    path('api/oracle-snap-list', views.ApiOracleSnapList),
+    path('api/oracle-report-list', views.ApiOracleReportList.as_view()),
+    path('api/oracle-create-report', views.ApiOracleCreateReport),
+    path('api/oracle-report/<int:pk>', views.ApiOracleReportDetail.as_view()),
 ]
 
