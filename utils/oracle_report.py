@@ -62,10 +62,7 @@ class OracleReport(OracleBase):
         return [(ret.read(),)]
 
 
-    def get_ash(self,dbid,instance_num,begin_snap,end_snap):
-
-        start_time = datetime.strptime(begin_snap,"%Y-%m-%dT%H:%M:%S.%fZ")
-        end_time = datetime.strptime(end_snap,"%Y-%m-%dT%H:%M:%S.%fZ")
+    def get_ash(self,dbid,instance_num,report_begin_time,report_end_time):
 
         sql = """select output from table (
                         DBMS_WORKLOAD_REPOSITORY.ASH_REPORT_HTML(
@@ -74,7 +71,7 @@ class OracleReport(OracleBase):
                         TO_DATE('{}','YYYY-MM-DD HH24:MI:SS'),
                         TO_DATE('{}','YYYY-MM-DD HH24:MI:SS')
                      ))
-                """.format(dbid,instance_num,start_time,end_time)
+                """.format(dbid,instance_num,report_begin_time,report_end_time)
 
         res = super().query_all(sql,self.db_conn)
         return res
@@ -96,8 +93,8 @@ class OracleReport(OracleBase):
         dbid = res[0]
 
         if report_type == 'ash':
-            report_begin_time = begin_snap
-            report_end_time = end_snap
+            report_begin_time = datetime.strptime(begin_snap,"%Y-%m-%dT%H:%M:%S.%fZ") + timedelta(hours=8)
+            report_end_time = datetime.strptime(end_snap,"%Y-%m-%dT%H:%M:%S.%fZ")  + timedelta(hours=8)
         else:
             sql = "select to_char(a.end_interval_time,'yyyy-mm-dd hh24:mi:ss') from dba_hist_snapshot a where a.snap_id=%s" % begin_snap
             res = super().query_one(sql,self.db_conn)
@@ -111,7 +108,7 @@ class OracleReport(OracleBase):
         elif report_type == 'addm':
             data = self.get_addm(instance_name, dbid, instance_num, begin_snap, end_snap)
         else:
-            data = self.get_ash(dbid, instance_num, begin_snap, end_snap)
+            data = self.get_ash(dbid, instance_num, report_begin_time, report_end_time)
 
         if report_type == 'addm':
             suffix = 'txt'
