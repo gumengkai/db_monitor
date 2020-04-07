@@ -2,6 +2,7 @@
 
 from utils.tools import mysql_exec,mysql_query,now,archive_table,clear_table
 import check.checklog as checklog
+from utils.send_email import my_send_email
 
 def check_alarm():
     alarm_time = now()
@@ -32,6 +33,7 @@ def check_alarm():
                     checklog.logger.warning(alarm_content)
                     mysql_exec(insert_sql)
                     # is_send_email(alarm_name, tags, alarm_url, alarm_title, alarm_content)
+                    my_send_email(alarm_title,alarm_content)
 
 if __name__ == '__main__':
     check_alarm()
