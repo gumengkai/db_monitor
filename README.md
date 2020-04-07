@@ -57,7 +57,7 @@ git clone https://github.com/gumengkai/db_monitor
 ##### 安装依赖包
 pip install -r requirements.txt
 
-##### setting配置
+##### settings配置
 MySQL数据库：
 
 DATABASES = {  
@@ -76,6 +76,21 @@ Redis：
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
 
 CELERY_BROKER_URL = 'redis://localhost:6379/2'
+
+发送邮件配置：
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' #一般不需要修改
+
+EMAIL_HOST = 'smtp.163.com'
+
+EMAIL_PORT = 25
+
+EMAIL_HOST_USER = '*********'    # 邮箱登录名，如11111111111@163.com
+
+EMAIL_HOST_PASSWORD = '*********'   #此处为客户端授权码，不是邮箱密码，需要在邮箱服务商设置
+
+EMAIL_TO_USER = ['1782365880@qq.com','gumengkai@hotmail.com'] # 发送邮件列表,参考格式设置
+
 
 ##### 创建数据库
 python manage.py makemigrations
