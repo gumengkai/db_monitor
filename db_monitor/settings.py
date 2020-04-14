@@ -278,10 +278,10 @@ SWAGGER_SETTINGS = {
 CHECK_LOG_DIR = os.path.join(BASE_DIR, 'logs')
 
 # send email
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' #一般不需要修改
+IS_SEND_EMAIL = 0
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.163.com'
 EMAIL_PORT = 25
-EMAIL_HOST_USER = '*********'    # 邮箱登录名，如11111111111@163.com
-EMAIL_HOST_PASSWORD = '*********'   #此处为客户端授权码，不是邮箱密码，需要在邮箱服务商设置
-EMAIL_TO_USER = ['1782365880@qq.com','gumengkai@hotmail.com'] # 发送邮件列表,参考格式设置
-
+EMAIL_HOST_USER = '*******'
+EMAIL_HOST_PASSWORD = '*********'
+EMAIL_TO_USER = ['1782365880@qq.com','gumengkai@hotmail.com']

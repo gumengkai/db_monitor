@@ -58,7 +58,7 @@ git clone https://github.com/gumengkai/db_monitor
 pip install -r requirements.txt
 
 ##### settings配置
-MySQL数据库：
+--MySQL数据库：
 
 DATABASES = {  
     'default': {  
@@ -71,13 +71,13 @@ DATABASES = {
     }
 }
 
-Redis：
+--Redis：
 
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
 
 CELERY_BROKER_URL = 'redis://localhost:6379/2'
 
-发送邮件配置：
+--邮件配置：
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' #一般不需要修改
 
@@ -104,7 +104,7 @@ python manage.py createsuperuser(创建登录用户)
 @install/initdata.sql
 
 #### 6. 启动
-python manage.py runserver
+python manage.py runserver 0.0.0.0:8000 #建议使用固定IP地址启动
 
 celery –A db_monitor worker –l info
 
@@ -147,6 +147,9 @@ grant.sql & table.sql & procedure.sql
 
 ## 交流学习
 - QQ群 916746047
+
+另外，安装过程中出现的问题可优先查看此文档：
+https://docs.qq.com/doc/DZHlBSGFGd1lpWUVS
 
 Copyright © 2019 DB monitor
 
