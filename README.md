@@ -79,6 +79,8 @@ CELERY_BROKER_URL = 'redis://localhost:6379/2'
 
 --邮件配置：
 
+IS_SEND_EAMIL = 0 #是否发送告警邮件，0：不发送 1：发送
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' #一般不需要修改
 
 EMAIL_HOST = 'smtp.163.com'
