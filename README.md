@@ -112,6 +112,20 @@ celery –A db_monitor worker –l info
 
 celery –A db_monitor beat –l info
 
+也可以使用脚本启动/关闭：
+
+celery: sh celery_start[shutdown].sh
+
+django: sh web_start[shutdown].sh
+
+关于日志：
+
+celery日志：logs/celery-worker.log & logs/celery-beat.log
+
+web日志： logs/django-web.log
+
+采集数据异常主要查看celery日志！
+
 #### 7. 前端配置
 请参考：[db_monitor_vue](https://github.com/gumengkai/db_monitor_vue)
 

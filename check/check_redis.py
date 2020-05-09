@@ -63,6 +63,16 @@ def check_redis(tags, redis_params):
         archive_table(tags,'redis_stat')
         # 后台日志
         get_redis_log(tags, redis_params, linux_params)
+    else:
+        error_msg = "{}:Redis连接失败" .format(tags)
+        checklog.logger.error(error_msg)
+        clear_table(tags,'redis_stat')
+        checklog.logger.info('{}:写入redis_stat采集数据'.format(tags))
+        sql = "insert into redis_stat(tags,host,port,status,check_time) values(%s,%s,%s,%s,%s)"
+        value = (tags, redis_params['host'], redis_params['port'], 1,check_time)
+        mysql_exec(sql, value)
+        archive_table(tags,'oracle_stat')
+
 
 
 if __name__ == '__main__':

@@ -529,19 +529,22 @@ class LinuxStat(LinuxBase):
         command = 'df -k'
         res = super().exec_command(command,self.conn)
         disk_list = [line.split() for line in res]
+        disk_list.pop(0)
+        # print(disk_list)
         for each in disk_list:
             if each[0] == 'Filesystem' or each[0] == 'none' or each[0] == 'udev' or each[0] in "tmpfs":
                 continue
             else:
                 ret.append(each)
+        # print(ret)
         return ret
 
 
 if __name__ == '__main__':
 
     linux_params = {
-        'hostname': '192.168.48.10',
-        'port': 10086,
+        'hostname': '192.168.48.60',
+        'port': 22,
         'username': 'root',
         'password': 'oracle'
     }
