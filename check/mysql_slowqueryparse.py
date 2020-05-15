@@ -158,15 +158,15 @@ def get_mysql_slowquery(tags,mysql_params,linux_params):
 
 if __name__ =='__main__':
     mysql_params = {
-        'host': '192.168.48.50',
+        'host': '192.168.48.51',
         'port': 3306,
         'user': 'root',
         'password': 'mysqld'
     }
     linux_params =   {
-        'hostname': '192.168.48.50',
+        'hostname': '192.168.48.51',
         'port': 22,
         'username':'root',
         'password':'mysqld'
     }
-    get_mysql_slowquery('mysql50',mysql_params,linux_params)
+    get_mysql_slowquery('mysql-master',mysql_params,linux_params)
