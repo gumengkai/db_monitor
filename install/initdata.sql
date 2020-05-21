@@ -34,7 +34,13 @@ INSERT INTO `alarm_conf` VALUES ('23', '4', 'Linux主机swap使用率告警', '>
 INSERT INTO `alarm_conf` VALUES ('24', '3', 'Redis通断告警', '>=', '1', '连续中断次数', null, 'select tags,\r\n       concat(host, \':\', port) url,  \r\n       concat(tags,\r\n              \':Redis通断告警\',\r\n              \'\\n 告警时间：\',\r\n              current_timestamp(),\r\n              \' \\n Redis url: \',\r\n              host,\r\n              \':\',\r\n              port\r\n             ) content\r\n  from redis\r\n where mon_status = \'connected error\' and 99 > %s\r\n  and %s', 'redis_list', 'alarm_connect');
 INSERT INTO `alarm_conf` VALUES ('25', '3', 'Redis内存使用率告警', '>=', '80', '使用百分比', null, 'select tags,\r\n       concat(host, \':\', port) url,  \r\n       concat(tags,\r\n              \':Redis内存使用率告警\',\r\n              \'\\n 告警时间：\',\r\n              current_timestamp(),\r\n              \' \\n Redis url: \',\r\n              host,\r\n              \':\',\r\n              port,\r\n              \' \\n 最大内存配置(MB)\',\r\n              max_memory,\r\n              \' \\n 使用内存大小(MB)\',\r\n              used_memory,\r\n              \' \\n 内存使用率\',\r\n              used_memory_pct,\r\n              \'%%\'\r\n             ) content\r\n  from redis\r\n where used_memory_pct >= %s\r\n  and %s', 'redis_list', 'alarm_mem');
 
-INSERT INTO `django_celery_beat_intervalschedule` VALUES ('1', '10', 'minutes');
+INSERT INTO `django_celery_beat_intervalschedule` VALUES ('1', '1', 'minutes');
+
+INSERT INTO `django_celery_beat_intervalschedule` VALUES ('2', '10', 'minutes');
+
+INSERT INTO `django_celery_beat_intervalschedule` VALUES ('3', '30', 'minutes');
+
 
 INSERT INTO `django_celery_beat_periodictask` VALUES ('3', 'maincheck', 'system.tasks.main_check', '[]', '{}', null, null, null, null, '1', now(), '0', now(), '', null, '1', null, '0', null, null, '{}', null);
 
+INSERT INTO `users` VALUES ('1', 'pbkdf2_sha256$150000$Ky2xUHG0UsAf$pLW6ZiA45dekRVmBVUOt/fCkwb9ovbTicoTePh8S2i4=', '2020-05-20 10:40:37.840189', '1', 'admin', '', '', '', '1', '1', '2020-05-20 10:38:48.529826', null, null, null);

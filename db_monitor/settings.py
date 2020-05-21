@@ -97,9 +97,9 @@ AUTHENTICATION_BACKENDS = ('system.views.CustomBackend',)  ## 重新登录验证
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': '192.168.48.51',
+        'HOST': 'db',
         'PORT': '3306',
-        'NAME': 'db_monitor_dev',
+        'NAME': 'db_monitor',
         'USER': 'root',
         'PASSWORD': 'mysqld',
     }
@@ -192,9 +192,9 @@ PAGINATION_SETTINGS = {
 DISPLAY_PER_PAGE = 15
 
 ## celery 4
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
+CELERY_RESULT_BACKEND = 'redis://redis:6379/1'
 # CELERY_RESULT_BACKEND = 'django-db'
-CELERY_BROKER_URL = 'redis://localhost:6379/2'
+CELERY_BROKER_URL = 'redis://redis:6379/2'
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 CELERYD_CONCURRENCY = 4
 CELERY_TIMEZONE = 'Asia/Shanghai'

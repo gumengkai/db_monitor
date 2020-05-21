@@ -105,6 +105,8 @@ python manage.py createsuperuser(创建登录用户)
 
 @install/initdata.sql
 
+初始化脚本包含celery初始数据和admin初始用户(密码为111111)
+
 #### 6. 启动
 python manage.py runserver 0.0.0.0:8000 #建议使用固定IP地址启动
 
@@ -166,6 +168,9 @@ grant.sql & table.sql & procedure.sql
 
 另外，安装过程中出现的问题可优先查看此文档：
 https://docs.qq.com/doc/DZHlBSGFGd1lpWUVS
+
+docker部署可参考：
+https://blog.csdn.net/gumengkai/article/details/106250548
 
 Copyright © 2019 DB monitor
 
