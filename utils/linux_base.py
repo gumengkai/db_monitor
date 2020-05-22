@@ -45,7 +45,7 @@ class LinuxBase(object):
 
             yield (b'', remote_file.tell())
         except Exception as e:
-            print("file not exists")
+            print("read file error")
             return(None,None)
 
     # read last n of file content
