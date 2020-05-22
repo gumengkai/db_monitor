@@ -101,8 +101,8 @@ def get_redis_log(tags,redis_params,linux_params):
     if not log:
          redis_conn = RedisBase(redis_params).connection()
          log_dir = redis_conn.config_get('dir')['dir']
-         log = redis_conn.config_get('logfile')['logfile']
-         log = os.path.join(log_dir,log)
+         logfile = redis_conn.config_get('logfile')['logfile']
+         log = os.path.join(log_dir,logfile)
          log_seek = 0
          sql = "delete from alert_log where tags='{}' and type=3 ".format(tags)
          mysql_exec(sql)

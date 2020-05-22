@@ -54,6 +54,9 @@ class RedisStat(object):
             self.old_stat[each] = 0
         for each in COMMANDSTATS_KEYS:
             self.old_commandstats[each] = 0
+        for each in COMMANDSTATS_KEYS:
+            self.res['commandstats'][each] = 0
+
 
     # 配置信息
     def get_redis_config(self):
@@ -97,12 +100,10 @@ if __name__ == "__main__":
     redis_conn = redis.StrictRedis(host='192.168.48.60', port=6379)
     the_redis = RedisStat(redis_conn)
     the_redis.get_redis_stat()
-    time.sleep(60)
+    time.sleep(1)
     the_redis.get_redis_stat()
     the_redis.get_redis_config()
     redis_data = the_redis.res
-    print(redis_data)
-
 
 
 

@@ -32,17 +32,22 @@ class LinuxBase(object):
     # read all of file content
     def readfile(self,file,seek=0):
         _,sftp_client = self.connection()
-        file_size = sftp_client.stat(file).st_size
-        with sftp_client.open(file,'rb') as remote_file:
-            remote_file.prefetch(file_size)
-            remote_file.seek(seek)
-            while True:
-                line = remote_file.readline()
-                if not line:
-                    break
-                yield (line, 0)
+        try:
+            file_size = sftp_client.stat(file).st_size
+            with sftp_client.open(file, 'rb') as remote_file:
+                remote_file.prefetch(file_size)
+                remote_file.seek(seek)
+                while True:
+                    line = remote_file.readline()
+                    if not line:
+                        break
+                    yield (line, 0)
 
-        yield (b'',remote_file.tell())
+            yield (b'', remote_file.tell())
+        except Exception as e:
+            print("file not exists")
+            return(None,None)
+
     # read last n of file content
     def readfile_n(self,file,num):
         cmd = 'tail -{} {}'.format(num,file)
