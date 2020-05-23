@@ -59,8 +59,10 @@ def check_oracle(tags,oracle_params):
         oracle_load = oracle_data['load']
         # PGA使用率
         is_pga = para(db_conn, 'pga_aggregate_target')
-        if is_pga != 0:
+        if int(is_pga) > 0:
             pga_target_size, pga_used_size, pga_used_percent = pga(db_conn)
+        else:
+            pga_target_size, pga_used_size, pga_used_percent = (0,0,0)
         if database_role == 'PYSICAL STANDBY DATABASE':
             adg_trans_lag, adg_trans_value = adg_trans(db_conn)
             adg_apply_lag, adg_apply_value = adg_apply(db_conn)
