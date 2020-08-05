@@ -62,7 +62,7 @@ def get_utctime(loctime):
 
 def get_redis_params(tags):
     sql = "select t1.tags,t1.host,t1.port,t1.redis_version,t1.password,t2.user,t2.password,t2.sshport" \
-          " from redis_list t1 left join linux_list t2 on t1.linux_tags=t2.tags and t1.tags= '{}'".format(tags)
+          " from redis_list t1 inner join linux_list t2 on t1.linux_tags=t2.tags where t1.tags= '{}'".format(tags)
     res = mysql_query(sql)[0]
     return {
         'host': res[1],
@@ -76,7 +76,7 @@ def get_redis_params(tags):
 
 def get_oracle_params(tags):
     sql = "select t1.tags,t1.host,t1.port,t1.service_name,t1.db_user,t1.db_password,t1.db_user_cdb,t1.db_password_cdb,t1.service_name_cdb," \
-          "t2.user,t2.password,t2.sshport,t1.db_version from oracle_list t1 left join linux_list t2  on t1.linux_tags=t2.tags and t1.tags='{}' ".format(tags)
+          "t2.user,t2.password,t2.sshport,t1.db_version from oracle_list t1 inner join linux_list t2  on t1.linux_tags=t2.tags where t1.tags='{}' ".format(tags)
     res = mysql_query(sql)[0]
     return  {
         'host': res[1],
