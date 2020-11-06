@@ -64,8 +64,8 @@ def check_linux(tags,linux_params):
             dev, total_size, used_size, free_size, used_percent, mount_point = each
             used_percent = float(used_percent.replace('%',''))
             insert_data_sql = '''insert into linux_disk(tags,host,dev,total_size,used_size,free_size,used_percent,mount_point,check_time) values(%s,%s,%s,%s,%s,%s,%s,%s,%s)'''
-            values = (tags, host, dev, round(float(total_size) / 1024, 2), round(float(used_size) / 1024, 2),
-                      round(float(free_size) / 1024, 2), used_percent, mount_point, now())
+            values = (tags, host, dev, round(float(total_size)/1024/1024, 2), round(float(used_size)/1024/1024, 2),
+                      round(float(free_size)/1024/1024, 2), used_percent, mount_point, now())
             mysql_exec(insert_data_sql, values)
         archive_table(tags,'linux_disk')
 
