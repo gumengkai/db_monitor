@@ -82,8 +82,8 @@ class MysqlStat(models.Model):
 
 
 class MysqlSlowquery(models.Model):
-    tags = models.CharField("标签",max_length=256)
-    host = models.CharField("主机ip",max_length=32)
+    tags = models.CharField("标签",max_length=32)
+    host = models.CharField("主机ip",max_length=256)
     start_time  = models.CharField("执行时间",max_length=64)
     client_host = models.CharField("主机信息",max_length=64)
     db_name = models.CharField("数据库名",max_length=64)
