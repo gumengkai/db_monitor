@@ -88,15 +88,13 @@ class LinuxStat(LinuxBase):
         frame = res.split(' ')[11]
         # linux version
         linux_version = ''
-        command = 'lsb_release -a'
+        command = 'cat /etc/redhat-release'
         res = super().exec_command(command,self.conn)
+        linux_version = res.readlines()[0]
+        # print(linux_version)
         # up days
         uptime = self.get_uptime()
         up_days = round(float(uptime) / 60 / 60 / 24, 2)
-
-        for each in  res.readlines():
-            if each.startswith('Description'):
-                linux_version = each.split(':')[1].strip()
 
         return {
             'hostname': hostname,
@@ -543,7 +541,7 @@ class LinuxStat(LinuxBase):
 if __name__ == '__main__':
 
     linux_params = {
-        'hostname': '192.168.48.60',
+        'hostname': '192.168.48.51',
         'port': 22,
         'username': 'root',
         'password': 'oracle'
@@ -552,5 +550,5 @@ if __name__ == '__main__':
 
     linuxstat = LinuxStat(linux_params,linux_conn)
 
-    print(linuxstat.get_diskfree())
+    print(linuxstat.get_host_info())
 

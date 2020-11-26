@@ -36,6 +36,8 @@
 用户名：admin 
 密码：111111
 
+注：资源紧张及各种原因，demo已停用，想看的同学建议自行部署，qq群中提供有docker的部署包
+
 ## 安装部署
 #### 1. 安装python3.6(略)
 
@@ -171,6 +173,8 @@ https://docs.qq.com/doc/DZHlBSGFGd1lpWUVS
 
 docker部署可参考：
 https://blog.csdn.net/gumengkai/article/details/106250548
+
+qq群文件中提供有完整的docker部署目录docker_dbmonitor供参考，理论上可以直接使用，部署用linux服务器内存不应小于4G
 
 Copyright © 2019 DB monitor
 
