@@ -6,7 +6,9 @@ import check.checklog as checklog
 from utils.tools import *
 import redis
 import time
+import timeout_decorator
 
+@timeout_decorator.timeout(60)
 def check_redis(tags, redis_params):
     check_time = now()
     host = redis_params['host']

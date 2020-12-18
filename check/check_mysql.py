@@ -7,8 +7,9 @@ from check.mysql_stat import MySQLStat
 from check.mysql_logparser import get_mysql_alert
 from check.mysql_slowqueryparse import get_mysql_slowquery
 import time
+import timeout_decorator
 
-
+@timeout_decorator.timeout(60)
 def check_mysql(tags, mysql_params):
     check_time = now()
     host = mysql_params['host']

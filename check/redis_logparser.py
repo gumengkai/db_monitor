@@ -107,13 +107,14 @@ def get_redis_log(tags,redis_params,linux_params):
          sql = "delete from alert_log where tags='{}' and type=3 ".format(tags)
          mysql_exec(sql)
     # get log content
-    linux_oper = LinuxBase(linux_params)
-    alert_content = linux_oper.readfile(log,seek=log_seek)
-    # parse log
-    log_seek = parse_redis_logs(tags,host,alert_content)
-    # update alert log info to mysqlinfo
-    sql = "update redis_list set log='{}',log_seek={} where tags='{}' " .format(log,log_seek,tags)
-    mysql_exec(sql)
+    if log:
+        linux_oper = LinuxBase(linux_params)
+        alert_content = linux_oper.readfile(log, seek=log_seek)
+        # parse log
+        log_seek = parse_redis_logs(tags, host, alert_content)
+        # update alert log info to mysqlinfo
+        sql = "update redis_list set log='{}',log_seek={} where tags='{}' ".format(log, log_seek, tags)
+        mysql_exec(sql)
 
 if __name__ =='__main__':
     redis_params = {

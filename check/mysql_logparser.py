@@ -104,14 +104,17 @@ def get_mysql_alert(tags,mysql_params,linux_params):
         alert_log_seek = 0
         sql = "delete from alert_log where tags='{}' and type=2 ".format(tags)
         mysql_exec(sql)
-    # get alert log content
-    linux_oper = LinuxBase(linux_params)
-    alert_content = linux_oper.readfile(alert_log,seek=alert_log_seek)
-    # parse log
-    alert_log_seek = parse_mysql_alert_logs(tags,host,alert_content)
-    # update alert log info to mysqlinfo
-    sql = "update mysql_list set alert_log='{}',alert_log_seek={} where tags='{}' " .format(alert_log,alert_log_seek,tags)
-    mysql_exec(sql)
+    if  alert_log:
+        # get alert log content
+        linux_oper = LinuxBase(linux_params)
+        alert_content = linux_oper.readfile(alert_log, seek=alert_log_seek)
+        # parse log
+        alert_log_seek = parse_mysql_alert_logs(tags, host, alert_content)
+        # update alert log info to mysqlinfo
+        sql = "update mysql_list set alert_log='{}',alert_log_seek={} where tags='{}' ".format(alert_log,
+                                                                                               alert_log_seek, tags)
+        mysql_exec(sql)
+
 
 if __name__ =='__main__':
     mysql_params = {

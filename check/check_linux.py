@@ -4,7 +4,9 @@ import check.checklog as checklog
 from utils.tools import mysql_exec,now,clear_table,archive_table
 from check.linux_stat import LinuxStat
 from utils.linux_base import LinuxBase
+import timeout_decorator
 
+@timeout_decorator.timeout(60)
 def check_linux(tags,linux_params):
     check_time = now()
     host = linux_params['hostname']

@@ -8,7 +8,9 @@ from utils.tools import *
 from check.oracle_logparser import get_oracle_alert
 import time
 from datetime import datetime
+import timeout_decorator
 
+@timeout_decorator.timeout(60)
 def check_oracle(tags,oracle_params):
     db_version = oracle_params['db_version']
     host = oracle_params['host']
@@ -136,6 +138,7 @@ def check_oracle(tags,oracle_params):
                                   "values('{tags}','{host}',{port},'{service_name}',{group_no},{thread_no},'{type}',{sequence_no}," \
                               "{size},'{archived}','{status}','{member}','{check_time}')"
             insert_sql = insert_data_sql.format(**locals())
+            insert_sql = insert_sql.replace('None','NULL')
             mysql_exec(insert_sql)
 
         # 表空间
