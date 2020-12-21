@@ -530,7 +530,7 @@ class LinuxStat(LinuxBase):
         disk_list.pop(0)
         # print(disk_list)
         for each in disk_list:
-            if each[0] == 'Filesystem' or each[0] == 'none' or each[0] == 'udev' or each[0] in "tmpfs"  or 'docker' in each[5]:
+            if each[0] == 'Filesystem' or each[0] == 'none' or each[0] == 'udev' or each[0] in "tmpfs"  or 'docker' in each[5] or each[5].startswith('/run'):
                 continue
             else:
                 ret.append(each)

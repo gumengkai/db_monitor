@@ -155,8 +155,8 @@ def get_mysql_slowquery(tags,mysql_params,linux_params):
         slowquery_log_seek = parse_mysql_slowquery_logs(tags, host, slowquery_content)
         # update alert log info to mysqlinfo
         sql = "update mysql_list set slowquery_log='{}',slowquery_log_seek={} where tags='{}' ".format(slowquery_log,
-                                                                                                       slowquery_log_seek,
-                                                                                                       tags)
+                                                                                                       slowquery_log_seek,tags)
+        sql = sql.replace('None','NULL')
         mysql_exec(sql)
 
 if __name__ =='__main__':

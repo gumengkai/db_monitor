@@ -36,7 +36,7 @@ def get_log_level_redis(log_content):
         return "info"
 
 def parse_redis_logs(tags,host,log_stream):
-
+    log_pos = 0
     log_meta = {}
     reg_date = re.compile('(\d{2} [a-zA-Z]{3} \d{2}:\d{2}:\d{2})')
 

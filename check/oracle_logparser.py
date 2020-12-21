@@ -45,6 +45,7 @@ def save_oracle_alert_log(tags,host,log_meta):
 def parse_oracle_alert_logs(tags,host,log_stream,version):
     """Wed Mar 02 14:00:30 2016"""
     # datetime.strptime(dt, '%a %b %d %H:%M:%S %Y')
+    log_pos = 0
     log_buffer = []
     log_meta = {}
 

@@ -36,7 +36,8 @@ def get_log_level_mysql(log_content):
         return "info"
 
 def parse_mysql_alert_logs(tags,host,log_stream):
-
+    
+    log_pos = 0
     log_meta = {}
 
     reg_date = re.compile('(\d{6} \d{2}:\d{2}:\d{2})|(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})|(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})')
