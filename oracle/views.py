@@ -227,16 +227,22 @@ def ApiOracleUndoTableSpaceUsed(request):
 class ApiOracleTableStats(generics.ListAPIView):
     queryset = OracleTableStats.objects.get_queryset().order_by('-change_pct')
     serializer_class = OracleTableStatsSerializer
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
+    filter_fields = ('tags', 'host')
     permission_classes = (permissions.DjangoModelPermissions,)
 
 class ApiOracleControlFile(generics.ListAPIView):
     queryset = OracleControlFile.objects.get_queryset().order_by('name')
     serializer_class = OracleControlFileSerializer
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
+    filter_fields = ('tags', 'host')
     permission_classes = (permissions.DjangoModelPermissions,)
 
 class ApiOracleRedoLog(generics.ListAPIView):
     queryset = OracleRedoLog.objects.get_queryset().order_by('group_no')
     serializer_class = OracleRedoLogSerializer
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
+    filter_fields = ('tags', 'host')
     permission_classes = (permissions.DjangoModelPermissions,)
 
 
