@@ -12,7 +12,6 @@ from utils.oracle_base import OracleBase
 @shared_task
 def create_oracle_report(tags,oracle_params,report_type,begin_snap,end_snap):
     print('task begin!')
-    # db_conn = OracleBase(oracle_params).connection()
-    db_conn_cdb = OracleBase(oracle_params).connection_cdb()
-    oracle_report = OracleReport(db_conn_cdb,tags,oracle_params)
+    db_conn = OracleBase(oracle_params).connection()
+    oracle_report = OracleReport(db_conn,tags,oracle_params)
     oracle_report.get_report(report_type,begin_snap,end_snap)
