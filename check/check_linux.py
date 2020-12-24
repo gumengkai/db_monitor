@@ -13,7 +13,7 @@ def check_linux(tags,linux_params):
     port = linux_params['port']
     # create connection
     linux_conn, _ = LinuxBase(linux_params).connection()
-    if linux_conn:
+    try:
         checklog.logger.info('{}:开始获取Linux主机监控信息' .format(tags))
         # get linuxstat data
         linuxstat = LinuxStat(linux_params, linux_conn).get_linux()
@@ -80,8 +80,8 @@ def check_linux(tags,linux_params):
             insert_sql = insert_data_sql.format(**insert_data_values)
             mysql_exec(insert_sql)
         archive_table(tags,'linux_io_stat')
-    else:
-        error_msg = "{}:linux主机连接失败" .format(tags)
+    except Exception as e:
+        error_msg = "{}:linux主机连接失败,{}" .format(tags,e)
         checklog.logger.error(error_msg)
         checklog.logger.info('{}:写入linux_stat采集数据'.format(tags))
         clear_table(tags,'linux_stat')

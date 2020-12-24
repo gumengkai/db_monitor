@@ -6,7 +6,7 @@ import re
 import os
 from collections import defaultdict
 from utils.linux_base import LinuxBase
-
+import timeout_decorator
 
 stat_file_config = {
     'cpu': '/proc/stat',
@@ -57,6 +57,7 @@ class LinuxStat(LinuxBase):
             'vm': tuple(0 for _ in range(6))
         }
 
+    @timeout_decorator.timeout(60)
     def get_linux(self):
         # init net data
         net_nics = self.get_net_nics()
