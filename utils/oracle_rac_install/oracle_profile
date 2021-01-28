@@ -1,0 +1,21 @@
+# .bash_profile
+
+# Get the aliases and functions
+if [ -f ~/.bashrc ]; then
+	. ~/.bashrc
+fi
+
+# User specific environment and startup programs
+
+PATH=$PATH:$HOME/.local/bin:$HOME/bin
+
+export PATH
+
+umask 022
+export ORACLE_BASE=/u01/app/oracle
+export ORACLE_HOME=$ORACLE_BASE/product/19.0.0/dbhome_1
+export ORACLE_SID=NODE_ORACLE_SID
+export PATH=$PATH:$ORACLE_HOME/bin
+export NLS_DATE_FORMAT='yyyy-mm-dd hh24:mi:ss'
+export NLS_LANG=AMERICAN_AMERICA.ZHS16GBK
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ORACLE_HOME/lib

@@ -28,6 +28,10 @@ def mysql_query(sql):
     res = MysqlBase(mysql_params).query(sql)
     return res
 
+def mysql_django_query(sql):
+    res = MysqlBase(mysql_params).django_query(sql)
+    return res
+
 def mysql_exec(sql,value=''):
     if not value:
         MysqlBase(mysql_params).exec(sql, '')
@@ -42,6 +46,9 @@ def init_table(tab,tags):
 
 def now():
     return datetime.now(tz=utc_tz).strftime('%Y-%m-%d %H:%M:%S')
+
+def now_local():
+    return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
 def today():
     return datetime.now(tz=utc_tz)

@@ -83,3 +83,23 @@ class AlarmInfoHis(models.Model):
         db_table = 'alarm_info_his'
         verbose_name = "告警信息"
         verbose_name_plural = verbose_name
+
+class SetupLog(models.Model):
+    LOG_LEVEL = [
+        ('error', 'error'),
+        ('warn', 'warn'),
+        ('info', 'info')
+    ]
+
+    log_type = models.CharField("1:Oracle rac安装 ...",max_length=16)
+    log_time = models.CharField("日志时间",max_length=255)
+    log_level = models.CharField("日志级别",max_length=16,choices=LOG_LEVEL)
+    log_content = models.TextField("日志内容")
+
+    def __str__(self):
+        return self.tags
+
+    class Meta:
+        db_table = 'setup_log'
+        verbose_name = "数据库部署日志"
+        verbose_name_plural = verbose_name

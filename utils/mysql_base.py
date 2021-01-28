@@ -30,6 +30,24 @@ class MysqlBase(object):
         cur.execute(sql)
         return cur.fetchall()
 
+    def django_query(self,sql,db_conn=None):
+        if not db_conn:
+            db_conn = self.connection()
+        try:
+            cursor = db_conn.cursor()
+            count = cursor.execute(sql)
+            if count == 0:
+                result = 0
+            else:
+                desc = cursor.description
+                return [
+                    dict(zip([col[0] for col in desc], row))
+                    for row in cursor.fetchall()
+                ]
+            cursor.close()
+        except Exception as e:
+            print('mysql query error:{}'.format(e))
+
     def exec(self,sql,val):
         conn = self.connection()
         cur = conn.cursor()

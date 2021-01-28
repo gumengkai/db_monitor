@@ -1,0 +1,9 @@
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+192.168.48.51  cispdb1    
+192.168.48.52  cispdb2
+192.168.48.53  cispdb1    -vip
+192.168.48.54  cispdb2-vip
+10.10.10.101  cispdb1    -priv
+10.10.10.102  cispdb2-priv
+192.168.48.55  cispdb-cluster   cispdb-cluster-scan

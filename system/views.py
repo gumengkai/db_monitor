@@ -9,12 +9,18 @@ from django.shortcuts import render, HttpResponse
 from django.contrib.auth.backends import ModelBackend
 from system.models import Users
 from django.db.models import Q
-from .models import AlertLog,AlarmConf,AlarmInfo
+from .models import AlertLog,AlarmConf,AlarmInfo,SetupLog
 from rest_framework import permissions
 from rest_framework import generics
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
-from .serializers import AlertLogSerializer,AlarmConfSerializer,AlarmInfoSerializer
+from .serializers import AlertLogSerializer,AlarmConfSerializer,AlarmInfoSerializer,SetupLogSerializer
+from rest_framework.decorators import api_view, permission_classes
+from system.tasks import OracleRacInstall
+from rest_framework.permissions import IsAuthenticated
+from utils.tools import mysql_django_query
+from rest_framework.renderers import JSONRenderer
+
 
 logger = logging.getLogger('system')
 
@@ -201,6 +207,27 @@ class Menu(APIView):
                             'title': '告警配置'
                         },
                         'component': 'system/alarm-conf'
+                    }
+                ]
+            },
+            {
+                "path": '/setup',
+                "name": 'setup',
+                "meta": {
+                    "icon": 'ios-build',
+                    "title": '数据库部署'
+                },
+                "component": 'Main',
+                "children": [
+                    {
+                        'path': 'oracle-rac',
+                        'name': 'oracle-rac',
+                        'meta': {
+                            'access': ['system.view_alarminfo'],
+                            'icon': 'ios-menu',
+                            'title': 'Oracle RAC安装'
+                        },
+                        'component': 'system/rac-setup'
                     }
                 ]
             },
@@ -539,7 +566,6 @@ class ApiAlertLog(generics.ListAPIView):
     permission_classes = (permissions.DjangoModelPermissions,)
 
 
-
 class ApiAlarmConf(generics.ListCreateAPIView):
     queryset = AlarmConf.objects.get_queryset().order_by('-type')
     serializer_class = AlarmConfSerializer
@@ -570,3 +596,41 @@ class ApiAlarmInfoHis(generics.ListCreateAPIView):
     filter_fields = ('tags',)
     search_fields = ('tags','alarm_content',)
     permission_classes = (permissions.DjangoModelPermissions,)
+
+@api_view(['POST'])
+def ApiOracleRacSetup(request):
+    postBody = request.body
+    json_result = json.loads(postBody)
+    rac_info = json_result
+    node_list = [
+        {
+            'node_id': str(json_result['node1_id']),
+            'hostname': json_result['hostname'] + str(json_result['node1_id']),
+            'ip': json_result['node1_ip'],
+            'ip_vip': json_result['node1_vip'],
+            'ip_priv': json_result['node1_priv_ip'],
+            'password': json_result['node1_password']
+        },
+        {
+            'node_id': str(json_result['node2_id']),
+            'hostname': json_result['hostname'] + str(json_result['node2_id']),
+            'ip': json_result['node2_ip'],
+            'ip_vip': json_result['node2_vip'],
+            'ip_priv': json_result['node2_priv_ip'],
+            'password': json_result['node2_password']
+        },
+    ]
+    module = json_result['module']
+    # OracleRacInstall.delay(rac_info,node_list,module)
+    oracleracinstall = OracleRacInstall(rac_info, node_list)
+    oracleracinstall.do_rac_install(module)
+    return HttpResponse('success!')
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def ApiSetupLog(request):
+    sql = "select id,log_type,log_time,log_level,log_content from setup_log"
+    setup_log_list = mysql_django_query(sql)
+    serializer = SetupLogSerializer(setup_log_list,many=True)
+    json = JSONRenderer().render(serializer.data)
+    return HttpResponse(json)
