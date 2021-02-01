@@ -25,7 +25,9 @@ class OracleRacInstall():
             'grid': 5010,
             'oracle': 5011
         }
-        self.linux_packages = "openssh bc binutils compat-libcap1 compat-libstdc++ elfutils-libelf elfutils-libelf-devel fontconfig-devel glibc glibc-devel ksh libaio libaio-devel libX11 libXau libXi libXtst libXrender libXrender-devel libgcc librdmacm-devel libstdc++ libstdc++-devel libxcb make smartmontools sysstat gcc-c++"
+        self.linux_packages = "openssh bc binutils compat-libcap1 compat-libstdc++ elfutils-libelf elfutils-libelf-devel fontconfig-devel glibc " \
+                              "glibc-devel ksh libaio libaio-devel libX11 libXau libXi libXtst libXrender libXrender-devel libgcc librdmacm-devel " \
+                              "libstdc++ libstdc++-devel libxcb make smartmontools sysstat gcc-c++ nfs-utils net-tools unzip expect"
 
         self.local_path = os.getcwd() + '/utils/oracle_rac_install/'
 
@@ -62,7 +64,9 @@ class OracleRacInstall():
             'rm -rf /etc/init.tfa',
             'rm -f /var/tmp/.oracle',
             'rm -rf /tmp/CVU*',
-            'rm -rf /tmp/OraInstall*'
+            'rm -rf /tmp/OraInstall*',
+            'rm -rf /var/tmp/.oracle',
+            'rm -rf /opt/oracle'
         ]
         # 删除用户组
         cmd_list.extend(
@@ -75,8 +79,8 @@ class OracleRacInstall():
         )
         # 清除ASM信息
         cmd_list.extend(
-            ['dd if=/dev/zero of={} bs=8192 count=2147'.format(rac_info['ocr_disk']),
-            'dd if=/dev/zero of={} bs=8192 count=2147'.format(rac_info['data_disk'])]
+            ['dd if=/dev/zero of={} bs=8192 count=2147'.format(self.rac_info['ocr_disk']),
+            'dd if=/dev/zero of={} bs=8192 count=2147'.format(self.rac_info['data_disk'])]
         )
         # 清理完成后重启服务器
         cmd_list.extend(
@@ -91,7 +95,7 @@ class OracleRacInstall():
             }
             linux_conn, _ = LinuxBase(linux_params).connection()
             self.log('{}：开始清理Oracle RAC！'.format(node['ip']))
-            res = [LinuxBase(linux_params).exec_command(cmd, linux_conn) for cmd in cmd_list]
+            res = [LinuxBase(linux_params).exec_command_res(cmd, linux_conn) for cmd in cmd_list]
             self.log('Oracle RAC清理完成！')
 
 
@@ -101,31 +105,35 @@ class OracleRacInstall():
         LinuxBase(linux_params).sftp_upload_file('{}oracle_profile'.format(self.local_path), '/tmp/oracle_profile')
         LinuxBase(linux_params).sftp_upload_file('{}compat-libstdc++-33-3.2.3-72.el7.x86_64.rpm'.format(self.local_path),
                                                  '/tmp/compat-libstdc++-33-3.2.3-72.el7.x86_64.rpm')
+        LinuxBase(linux_params).sftp_upload_file('{}cvuqdisk-1.0.10-1.rpm'.format(self.local_path),
+                                                 '/tmp/cvuqdisk-1.0.10-1.rpm')
         LinuxBase(linux_params).sftp_upload_file('{}97-oracle-database-sysctl.conf'.format(self.local_path),
                                                  '/tmp/97-oracle-database-sysctl.conf')
         LinuxBase(linux_params).sftp_upload_file('{}oracle-database-preinstall-19c.conf'.format(self.local_path),
                                                  '/tmp/oracle-database-preinstall-19c.conf')
+        LinuxBase(linux_params).sftp_upload_file('{}runfixup.sh'.format(self.local_path),
+                                                 '/tmp/runfixup.sh')
 
     def linux_config(self, node1, node2):
         cmd_list = []
 
         # 修改/etc/hosts信息
-        ip_conf = "127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4\r\n" \
-                  "::1         localhost localhost.localdomain localhost6 localhost6.localdomain6\r\n" \
-                  "{}  {}\r\n" \
-                  "{}  {}\r\n" \
-                  "{}  {}-vip\r\n" \
-                  "{}  {}-vip\r\n" \
-                  "{}  {}-priv\r\n" \
-                  "{}  {}-priv\r\n" \
-                  "{}  {}-cluster   {}-cluster-scan".format(node1['ip'], rac_info['hostname'] + node1['node_id'],
-                                                            node2['ip'], rac_info['hostname'] + node2['node_id'],
-                                                            node1['ip_vip'], rac_info['hostname'] + node1['node_id'],
-                                                            node2['ip_vip'], rac_info['hostname'] + node2['node_id'],
-                                                            node1['ip_priv'], rac_info['hostname'] + node1['node_id'],
-                                                            node2['ip_priv'], rac_info['hostname'] + node2['node_id'],
-                                                            rac_info['scan_ip'], rac_info['hostname'],
-                                                            rac_info['hostname'])
+        ip_conf = "127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4\n" \
+                  "::1         localhost localhost.localdomain localhost6 localhost6.localdomain6\n" \
+                  "{}  {}\n" \
+                  "{}  {}\n" \
+                  "{}  {}-vip\n" \
+                  "{}  {}-vip\n" \
+                  "{}  {}-priv\n" \
+                  "{}  {}-priv\n" \
+                  "{}  {}-cluster   {}-cluster-scan".format(node1['ip'], self.rac_info['hostname'] + node1['node_id'],
+                                                            node2['ip'], self.rac_info['hostname'] + node2['node_id'],
+                                                            node1['ip_vip'], self.rac_info['hostname'] + node1['node_id'],
+                                                            node2['ip_vip'], self.rac_info['hostname'] + node2['node_id'],
+                                                            node1['ip_priv'], self.rac_info['hostname'] + node1['node_id'],
+                                                            node2['ip_priv'], self.rac_info['hostname'] + node2['node_id'],
+                                                            self.rac_info['scan_ip'], self.rac_info['hostname'],
+                                                            self.rac_info['hostname'])
         cmd_list.extend([
             'cat /dev/null > /etc/hosts',
             'echo "{}" > /etc/hosts'.format(ip_conf)
@@ -167,7 +175,8 @@ class OracleRacInstall():
         # yum安装必需包
         cmd_list.extend([
             'yum -y install {}'.format(self.linux_packages),
-            'rpm -ivh /tmp/compat-libstdc++-33-3.2.3-72.el7.x86_64.rpm'
+            'rpm -ivh /tmp/compat-libstdc++-33-3.2.3-72.el7.x86_64.rpm',
+            'rpm -ivh /tmp/cvuqdisk-1.0.10-1.rpm'
         ])
 
         # 内核参数设置
@@ -181,11 +190,25 @@ class OracleRacInstall():
             'mv /tmp/oracle-database-preinstall-19c.conf /etc/security/limits.d/oracle-database-preinstall-19c.conf'
         ])
 
+        # 执行runfixup脚本
+        # cmd_list.extend([
+        #     'sh /tmp/runfixup.sh'
+        # ])
+
+        # 关闭avahi-daemon服务
+        cmd_list.extend([
+            'systemctl stop avahi-daemon.socket',
+            'systemctl stop avahi-daemon.service',
+            'systemctl disable avahi-daemon.socket',
+            'systemctl disable avahi-daemon.service'
+            ]
+        )
+
         return cmd_list
 
     def do_linux_config(self, node1, node2):
         self.log('开始进行linux基础配置..')
-        for node in node_list:
+        for node in self.node_list:
             self.log('{} {}：开始进行linux操作系统配置！'.format(node['ip'], node['hostname']))
             cmd_list = self.linux_config(node1, node2)
 
@@ -215,9 +238,9 @@ class OracleRacInstall():
                     self.rac_info['dbname'] + node['node_id'])
             ])
 
-            res = [LinuxBase(linux_params).exec_command(cmd, linux_conn) for cmd in cmd_list]
+            res = [LinuxBase(linux_params).exec_command_res(cmd, linux_conn) for cmd in cmd_list]
             self.log('{} {}：linux操作系统配置完成'.format(node['ip'], node['hostname']))
-            self.log('所有节点linux基础配置完成！')
+        self.log('所有节点linux基础配置完成！')
 
     def grid_execute_scripts(self):
 
@@ -230,7 +253,7 @@ class OracleRacInstall():
                 'password': node['password']
             }
             linux_conn, _ = LinuxBase(linux_params).connection()
-            LinuxBase(linux_params).exec_command(cmd)
+            LinuxBase(linux_params).exec_command_res(cmd)
 
         for node in self.node_list:
             cmd = '/u01/app/19.0.0/grid/root.sh'
@@ -241,7 +264,7 @@ class OracleRacInstall():
                 'password': node['password']
             }
             linux_conn, _ = LinuxBase(linux_params).connection()
-            LinuxBase(linux_params).exec_command(cmd)
+            LinuxBase(linux_params).exec_command_res(cmd)
 
     def grid_install(self, node):
         self.log('开始进行grid集群软件安装..')
@@ -260,10 +283,10 @@ class OracleRacInstall():
 
         self.log('{} {}：开始解压缩grid安装包！'.format(node['ip'], node['hostname']))
         cmd = 'unzip -q -o /tmp/LINUX.X64_193000_grid_home.zip -d /u01/app/19.0.0/grid/'
-        LinuxBase(linux_params).exec_command(cmd)
+        LinuxBase(linux_params).exec_command_res(cmd)
         self.log('grid安装包解压缩完成！')
         cmd = 'rm -f /tmp/LINUX.X64_193000_grid_home.zip'
-        LinuxBase(linux_params).exec_command(cmd)
+        LinuxBase(linux_params).exec_command_res(cmd)
         self.log('grid安装包清理完成！')
 
         self.log('开始节点间grid用户ssh互信配置..')
@@ -277,7 +300,7 @@ class OracleRacInstall():
             'echo {} >> /tmp/hostlist.cfg' .format(self.rac_info['hostname']+'2'),
             'sh /tmp/auto_ssh.sh grid oracle /tmp/hostlist.cfg'
             ]
-        res = [LinuxBase(linux_params).exec_command(cmd, linux_conn) for cmd in cmd_list]
+        res = [LinuxBase(linux_params).exec_command_res(cmd) for cmd in cmd_list]
         self.log('grid用户ssh互信配置完成！')
 
         self.log('开始生成grid安装响应文件..')
@@ -293,28 +316,28 @@ class OracleRacInstall():
             "sed -i 's#NODE_OCR_DISK#{}#g' /tmp/gridsetup.rsp".format(self.rac_info['ocr_disk']),
             "sed -i 's#NODE_OCR_PATH#{}#g' /tmp/gridsetup.rsp".format(self.rac_info['disk_path'])
         ]
-        res = [LinuxBase(linux_params).exec_command(cmd, linux_conn) for cmd in cmd_list]
+        res = [LinuxBase(linux_params).exec_command_res(cmd, linux_conn) for cmd in cmd_list]
         self.log('grid安装响应文件生成完成！')
 
         # 先决条件检查
         # $ORACLE_HOME/runcluvfy.sh stage -pre crsinst -responseFile gridsetup.rsp
+        self.log('grid集群配置成功，请在1号节点{}上使用grid用户执行先决条件检查：$ORACLE_HOME/runcluvfy.sh stage -pre crsinst -responseFile /tmp/gridsetup.rsp'.format(node['ip']))
+
+        self.log('在先决条件检查完成后，请在1号节点{}上执行静默安装：/u01/app/19.0.0/grid/gridSetup.sh -silent -ignorePrereqFailure -responseFile /tmp/gridsetup.rsp'
+                 ' 并根据提示执行root.sh脚本'.format(node['ip']))
 
         # 执行静默安装
-        self.log('开始执行集群软件静默安装..请关注grid安装日志 {}：/tmp/gridsetup.log'.format(node['ip']))
-        cmd = '/u01/app/19.0.0/grid/gridSetup.sh -silent -ignorePrereqFailure -responseFile /tmp/gridsetup.rsp > /tmp/gridsetup.log'
-        LinuxBase(linux_params).exec_command(cmd)
-        self.log('grid集群件静默安装完成！')
-
-        self.log('请在所有节点上执行脚本(使用root用户)：'
-                 '1. /u01/app/oraInventory/orainstRoot.sh，2. /u01/app/19.0.0/grid/root.sh。执行顺序：先依次执行1节点{}，再依次执行2节点'
-                 '执行完root.sh脚本后以gird用户在{}上执行：'
-                 '/u01/app/19.0.0/grid/gridSetup.sh -executeConfigTools -responseFile /tmp/gridsetup.rsp -silent'.format(node['ip'],node['ip']))
+        # self.log('开始执行集群软件静默安装..请关注grid安装日志 {}：/tmp/gridsetup.log'.format(node['ip']))
+        # cmd = '/u01/app/19.0.0/grid/gridSetup.sh -silent -ignorePrereqFailure -responseFile /tmp/gridsetup.rsp > /tmp/gridsetup.log'
+        # LinuxBase(linux_params).exec_command_res(cmd)
+        # self.log('grid集群件静默安装完成！')
+        # self.log('请根据/tmp/gridsetup.log中的提示执行脚本！')
         # 执行静默安装脚本
         # self.grid_execute_scripts()
 
         # 执行配置工具脚本
         cmd = '/u01/app/19.0.0/grid/gridSetup.sh -executeConfigTools -responseFile /tmp/gridsetup.rsp -silent'
-        # LinuxBase(linux_params).exec_command(cmd)
+        # LinuxBase(linux_params).exec_command_res(cmd)
 
         # 安装后进行检查
         # $ORACLE_HOME/runcluvfy.sh  stage -post  crsinst -n "cispdb1,cispdb2"  -verbose
@@ -329,7 +352,7 @@ class OracleRacInstall():
                 'password': node['password']
             }
             linux_conn, _ = LinuxBase(linux_params).connection()
-            LinuxBase(linux_params).exec_command(cmd)
+            LinuxBase(linux_params).exec_command_res(cmd)
 
 
     def oracle_install(self, node):
@@ -346,10 +369,10 @@ class OracleRacInstall():
         self.log('oracle安装包上传完成！')
         self.log('开始解压缩oracle安装包..')
         cmd = 'unzip -q -o /tmp/LINUX.X64_193000_db_home.zip -d /u01/app/oracle/product/19.0.0/dbhome_1/'
-        LinuxBase(linux_params).exec_command(cmd)
+        LinuxBase(linux_params).exec_command_res(cmd)
         self.log('oracle安装包解压缩完成！')
         cmd = 'rm -f /tmp/LINUX.X64_193000_db_home.zip'
-        LinuxBase(linux_params).exec_command(cmd)
+        LinuxBase(linux_params).exec_command_res(cmd)
         self.log('oracle安装包清理完成！')
 
         # 配置oracle用户ssh互信
@@ -360,7 +383,7 @@ class OracleRacInstall():
             'echo {} >> /tmp/hostlist.cfg'.format(self.rac_info['hostname'] + '2'),
             'sh /tmp/auto_ssh.sh oracle oracle /tmp/hostlist.cfg'
         ]
-        res = [LinuxBase(linux_params).exec_command(cmd, linux_conn) for cmd in cmd_list]
+        res = [LinuxBase(linux_params).exec_command_res(cmd, linux_conn) for cmd in cmd_list]
         self.log('oracle用户ssh互信配置完成！')
 
         self.log('开始生成oracle安装响应文件..')
@@ -370,16 +393,19 @@ class OracleRacInstall():
         cmd_list = [
             "sed -i 's/NODE_HOSTNAME/{}/g' /tmp/db_install.rsp".format(self.rac_info['hostname']),
         ]
-        res = [LinuxBase(linux_params).exec_command(cmd, linux_conn) for cmd in cmd_list]
+        res = [LinuxBase(linux_params).exec_command_res(cmd, linux_conn) for cmd in cmd_list]
         self.log('oracle安装响应文件生成完成！')
 
+        self.log('oracle软件安装前配置成功，请在1号节点{}上使用oracle用户执行静默安装脚本：'
+                 '/u01/app/oracle/product/19.0.0/dbhome_1/runInstaller -silent -ignorePrereqFailure -responsefile /tmp/db_install.rsp '
+                 ' 并根据提示执行后续脚本'.format(node['ip']))
+
         # 执行静默安装
-        self.log('开始Oracle软件静默安装,请关注{}：/tmp/oraclesetup.log'.format(node[ip]))
-        cmd = '/u01/app/oracle/product/19.0.0/dbhome_1/runInstaller -silent -ignorePrereqFailure -responsefile /tmp/db_install.rsp >/tmp/oraclesetup.log'
-        LinuxBase(linux_params).exec_command(cmd)
-        self.log('Oracle软件静默安装完成！')
-        self.log('请在所有节点上执行脚本(使用root用户)：/u01/app/oracle/product/19.0.0/dbhome_1/root.sh，'
-                 '执行顺序：先执行{}1节点，再执行2节点'.format(node['ip']))
+        # self.log('开始Oracle软件静默安装,请关注{}：/tmp/oraclesetup.log'.format(node[ip]))
+        # cmd = '/u01/app/oracle/product/19.0.0/dbhome_1/runInstaller -silent -ignorePrereqFailure -responsefile /tmp/db_install.rsp >/tmp/oraclesetup.log'
+        # LinuxBase(linux_params).exec_command_res(cmd)
+        # self.log('Oracle软件静默安装完成！')
+        # self.log('请根据/tmp/oraclesetup.log中的提示执行脚本！')
 
         # 执行root脚本
         # self.oracle_execute_scripts()
@@ -398,7 +424,7 @@ class OracleRacInstall():
               "-redundancy EXTERNAL -au_size 4 -compatible.asm '19.0.0.0.0' " \
               "-compatible.rdbms '19.0.0.0.0' -compatible.advm '19.0.0.0.0'".format(self.rac_info['data_disk'])
 
-        res = LinuxBase(grid_params).exec_command(cmd)
+        LinuxBase(grid_params).exec_command_res(cmd)
         self.log('ASM磁盘组创建完成！')
 
         oracle_params = {
@@ -418,23 +444,29 @@ class OracleRacInstall():
             "sed -i 's/NODE_DBNAME/{}/g' /tmp/dbca.rsp".format(self.rac_info['dbname']),
             "sed -i 's/NODE_PDBNAME/{}/g' /tmp/dbca.rsp".format(self.rac_info['pdbname'])
         ]
-        res = [LinuxBase(oracle_params).exec_command(cmd, linux_conn) for cmd in cmd_list]
+        res = [LinuxBase(oracle_params).exec_command_res(cmd, linux_conn) for cmd in cmd_list]
         self.log('dbca建库响应文件生成完成！')
 
+        self.log('dbca配置成功，请在1号节点{}上使用oracle用户执行dbca建库脚本：/u01/app/oracle/product/19.0.0/dbhome_1/bin/dbca -silent -createDatabase -ignorePrereqFailure '
+                 '-responseFile /tmp/dbca.rsp'
+                 ' 并根据提示执行后续脚本'.format(node['ip']))
+
         # 开始静默安装
-        self.log('开始进行dbca静默安装，请关注{}：/tmp/dbca.log'.format(node['ip']))
-        cmd = '/u01/app/oracle/product/19.0.0/dbhome_1/bin/dbca -silent -createDatabase -ignorePrereqFailure ' \
-              '-responseFile /tmp/dbca.rsp > /tmp/dbca.log'
-        LinuxBase(oracle_params).exec_command(cmd)
-        self.log('dbca静默安装完成..')
+        # self.log('开始进行dbca静默安装，请关注{}：/tmp/dbca.log'.format(node['ip']))
+        # cmd = '/u01/app/oracle/product/19.0.0/dbhome_1/bin/dbca -silent -createDatabase -ignorePrereqFailure ' \
+        #       '-responseFile /tmp/dbca.rsp > /tmp/dbca.log'
+        # LinuxBase(oracle_params).exec_command_res(cmd)
+        # self.log('dbca静默安装完成..')
 
     def do_rac_install(self,module):
         node1 = self.node_list[0] if self.node_list[0]['node_id'] == '1' else self.node_list[1]
         node2 = self.node_list[1] if self.node_list[0]['node_id'] == '1' else self.node_list[0]
-        if module == 'rac':
+        if module == 'linux':
+            self.log('linux基础配置已启动..')
             self.clear_log()
-            self.log('rac安装已启动..')
             self.do_linux_config(node1, node2)
+        elif module == 'rac':
+            self.log('grid安装已启动..')
             self.grid_install(node1)
         elif module == 'oracle':
             self.log('oracle安装已启动..')

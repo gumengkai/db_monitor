@@ -20,7 +20,7 @@ from system.tasks import OracleRacInstall
 from rest_framework.permissions import IsAuthenticated
 from utils.tools import mysql_django_query
 from rest_framework.renderers import JSONRenderer
-
+from system.tasks import oracle_rac_setup
 
 logger = logging.getLogger('system')
 
@@ -621,9 +621,9 @@ def ApiOracleRacSetup(request):
         },
     ]
     module = json_result['module']
-    # OracleRacInstall.delay(rac_info,node_list,module)
-    oracleracinstall = OracleRacInstall(rac_info, node_list)
-    oracleracinstall.do_rac_install(module)
+    oracle_rac_setup.delay(rac_info,node_list,module)
+    # oracleracinstall = OracleRacInstall(rac_info, node_list)
+    # oracleracinstall.do_rac_install(module)
     return HttpResponse('success!')
 
 @api_view(['GET'])

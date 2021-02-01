@@ -62,7 +62,18 @@ class LinuxBase(object):
             if not ssh_client:
                 ssh_client, _ = self.connection()
             std_in, std_out, std_err = ssh_client.exec_command(command)
-            return std_out.read().decode()
+            return std_out
+        except Exception as e:
+            print(e)
+
+    def exec_command_res(self,command,ssh_client=None):
+        try:
+            if not ssh_client:
+                ssh_client, _ = self.connection()
+            std_in, std_out, std_err = ssh_client.exec_command(command)
+            res = std_out.read().decode()
+            print('执行命令：{}，执行结果：{}'.format(command,res))
+            return res
         except Exception as e:
             print(e)
 
