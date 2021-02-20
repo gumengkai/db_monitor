@@ -20,7 +20,7 @@ from system.tasks import OracleRacInstall
 from rest_framework.permissions import IsAuthenticated
 from utils.tools import mysql_django_query
 from rest_framework.renderers import JSONRenderer
-from system.tasks import oracle_rac_setup
+from system.tasks import oracle_rac_setup,oracle_rac_onenode_setup
 
 logger = logging.getLogger('system')
 
@@ -225,9 +225,19 @@ class Menu(APIView):
                         'meta': {
                             'access': ['system.view_alarminfo'],
                             'icon': 'ios-menu',
-                            'title': 'Oracle RAC安装'
+                            'title': 'Oracle RAC'
                         },
                         'component': 'system/rac-setup'
+                    },
+                    {
+                        'path': 'oracle-rac-onenode',
+                        'name': 'oracle-rac-onenode',
+                        'meta': {
+                            'access': ['system.view_alarminfo'],
+                            'icon': 'ios-menu',
+                            'title': 'Oracle RAC One Node'
+                        },
+                        'component': 'system/rac-onenode-setup'
                     }
                 ]
             },
@@ -622,6 +632,18 @@ def ApiOracleRacSetup(request):
     ]
     module = json_result['module']
     oracle_rac_setup.delay(rac_info,node_list,module)
+    # oracleracinstall = OracleRacInstall(rac_info, node_list)
+    # oracleracinstall.do_rac_install(module)
+    return HttpResponse('success!')
+
+@api_view(['POST'])
+def ApiOracleRacOneNodeSetup(request):
+    postBody = request.body
+    json_result = json.loads(postBody)
+    node_info = json_result
+    print(json_result)
+    module = json_result['module']
+    oracle_rac_onenode_setup.delay(node_info,module)
     # oracleracinstall = OracleRacInstall(rac_info, node_list)
     # oracleracinstall.do_rac_install(module)
     return HttpResponse('success!')

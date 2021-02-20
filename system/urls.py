@@ -14,4 +14,5 @@ urlpatterns = [
     path('api/alarm-info', views.ApiAlarmInfo.as_view()),
     path('api/oracle-rac-setup', views.ApiOracleRacSetup),
     path('api/setup-log', views.ApiSetupLog),
+    path('api/oracle-rac-onenode-setup', views.ApiOracleRacOneNodeSetup)
 ]

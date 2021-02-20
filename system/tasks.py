@@ -1,15 +1,22 @@
 from celery import shared_task
 from check.maincheck import checkall
 from utils.oracle_rac_install import OracleRacInstall
+from utils.oracle_rac_onenode_install import OracleRacOneNodeInstall
+
 
 @shared_task
 def main_check():
     checkall()
     return
 
-# oracle性能报告
 @shared_task
 def oracle_rac_setup(rac_info,node_list,module):
     print('Oracle RAC安装已启动！')
-    oracleracinstall = OracleRacInstall(rac_info, node_list)
-    oracleracinstall.do_rac_install(module)
+    oracle_rac_install = OracleRacInstall(rac_info, node_list)
+    oracle_rac_install.do_rac_install(module)
+
+@shared_task
+def oracle_rac_onenode_setup(node_info,module):
+    print('Oracle RAC One Node安装已启动！')
+    oracle_rac_onenode_install = OracleRacOneNodeInstall(node_info)
+    oracle_rac_onenode_install.do_rac_install(module)

@@ -1,12 +1,11 @@
 responseFileVersion=/oracle/assistants/rspfmt_dbca_response_schema_v19.0.0
 gdbName=NODE_DBNAME
 sid=NODE_DBNAME
-databaseConfigType=RAC
+databaseConfigType=SINGLE
 createAsContainerDatabase=true
 numberOfPDBs=1
 pdbName=NODE_PDBNAME
 pdbAdminPassword=Oracle_2021
-nodelist=NODE_HOSTNAME1,NODE_HOSTNAME2
 templateName=General_Purpose.dbc
 sysPassword=Oracle_2021
 systemPassword=Oracle_2021
