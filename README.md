@@ -130,6 +130,8 @@ web日志： logs/django-web.log
 
 采集数据异常主要查看celery日志！
 
+注：使用shell脚本启停时如遇到“/r command not found”，为linux与windows换行符格式差异导致，在Linux凭条可以在vim下执行:set ff=unix解决
+
 #### 7. 前端配置
 请参考：[db_monitor_vue](https://github.com/gumengkai/db_monitor_vue)
 
