@@ -113,9 +113,9 @@ class OracleRacOneNodeInstall():
     def get_shm_config(self):
         memtotal = get_memtotal(self.node_info['node_ip'],self.node_info['node_password'])
         # 物理内存-1G 单位为字节
-        shmmax = (float(memtotal)/1024-1)*1024*1024*1024
+        shmmax = (float(memtotal)/1024/1024-1)*1024*1024*1024
         # 物理内存-1G 单位为page 
-        shmall = (float(memtotal)/1024-1)*1024*1024/4
+        shmall = (float(memtotal)/1024/1024-1)*1024*1024/4
         return (int(shmmax),int(shmall))
 
     def linux_config(self):
