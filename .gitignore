@@ -13,6 +13,10 @@
 */__pycache__/*
 
 .vscode
+*.pid
+*.log
+*.zip
+*.swp
 
 /webssh
 /frontend
@@ -21,4 +25,3 @@
 
 configure.yaml
 celerybeat-schedule
-

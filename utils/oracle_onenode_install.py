@@ -264,6 +264,8 @@ class OracleOneNodeInstall():
         self.log('dbca配置成功，请在节点{}上使用oracle用户执行dbca建库脚本：/u01/app/oracle/product/19.0.0/dbhome_1/bin/dbca -silent -createDatabase -ignorePrereqFailure '
                  '-responseFile /tmp/dbca.rsp'
                  ' 并根据提示执行后续脚本'.format(self.node_info['node_ip']))
+                 
+        self.log('DBCA建库成功后，创建数据库监听：netca -silent -responsefile /u01/app/oracle/product/19.0.0/dbhome_1/assistants/netca/netca.rsp')
 
         # 开始静默安装
         # self.log('开始进行dbca静默安装，请关注{}：/tmp/dbca.log'.format(node['ip']))
