@@ -2,7 +2,7 @@
 
 from utils.linux_base import LinuxBase
 from utils.tools import now_local
-from utils.tools import mysql_exec,mysql_query,now
+from utils.tools import mysql_exec,mysql_query,now,get_memtotal
 import os
 
 class OracleOneNodeInstall():
@@ -92,6 +92,14 @@ class OracleOneNodeInstall():
                                                  '/tmp/97-oracle-database-sysctl.conf')
         LinuxBase(linux_params).sftp_upload_file('{}oracle-database-preinstall-19c.conf'.format(os.getcwd() + '/utils/oracle_onenode_install/'),
                                                  '/tmp/oracle-database-preinstall-19c.conf')
+    
+    def get_shm_config(self):
+        memtotal = get_memtotal(self.node_info['node_ip'],self.node_info['node_password'])
+        # 物理内存-1G 单位为字节
+        shmmax = (float(memtotal)/1024-1)*1024*1024*1024
+        # 物理内存-1G 单位为page 
+        shmall = (float(memtotal)/1024-1)*1024*1024/4
+        return (int(shmmax),int(shmall))
 
     def linux_config(self):
         cmd_list = []
@@ -140,8 +148,11 @@ class OracleOneNodeInstall():
         ])
 
         # 内核参数设置
+        shmmax,shmall = self.get_shm_config()
         cmd_list.extend([
             'mv /tmp/97-oracle-database-sysctl.conf /etc/sysctl.d/97-oracle-database-sysctl.conf',
+            "sed -i 's/NODE_SHMMAX/{}/g' /etc/sysctl.d/97-oracle-database-sysctl.conf".format(shmmax),
+            "sed -i 's/NODE_SHMALL/{}/g' /etc/sysctl.d/97-oracle-database-sysctl.conf".format(shmall),
             '/sbin/sysctl --system',
             '/sbin/sysctl -a'
         ])

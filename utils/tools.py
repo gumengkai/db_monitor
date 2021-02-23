@@ -6,6 +6,7 @@ from datetime import datetime,timedelta
 os.environ['DJANGO_SETTINGS_MODULE'] = 'db_monitor.settings'
 from django.conf import settings
 from utils.mysql_base import MysqlBase
+from check.linux_stat import LinuxStat
 
 HOST= settings.DATABASES['default']['HOST']
 PORT= settings.DATABASES['default']['PORT']
@@ -99,6 +100,17 @@ def get_oracle_params(tags):
         'sshport_os': res[11],
         'db_version': res[12]
     }
+
+def get_memtotal(host,password):
+    linux_params = {
+        'hostname': host,
+        'port': 22,
+        'username': 'root',
+        'password': password
+    }
+    linuxstat = LinuxStat(linux_params,'')
+    memtotal = linuxstat.get_memtotal()['memtotal']
+    return memtotal
 
 if __name__ == '__main__':
     loctime = '2019-12-10 08:30:39'
