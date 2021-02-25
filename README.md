@@ -36,7 +36,15 @@
 用户名：admin 
 密码：111111
 
-注：资源紧张及各种原因，demo已停用，想看的同学建议自行部署，qq群中提供有docker的部署包
+注：资源紧张及各种原因，demo已停用，想看的同学可以自行部署。
+
+懒人以及没有接触过的建议使用docker部署方式
+
+docker部署可参考：
+https://blog.csdn.net/gumengkai/article/details/106250548
+
+docker(懒人详细版)部署可参考，提供所有安装文件，可以直接在内网使用：
+https://stuxidianeducn-my.sharepoint.com/:f:/g/personal/gumengkai_stu_xidian_edu_cn/EljbazMtQtJKhPKsuY9ZljgBjp7ujQHxPfj6-Hk0dnhyxQ?e=8JOrTk
 
 ## 安装部署
 #### 1. 安装python3.6(略)
@@ -140,6 +148,17 @@ web日志： logs/django-web.log
 
 grant.sql & table.sql & procedure.sql
 
+#### 9. 访问地址
+取决于自己的前端和后端端口配置，默认访问地址为
+
+ip:8000/admin --后端
+
+ip:8001 --前端
+
+#### 10. 系统设置
+如采集频率，可在django后台管理页面进行配置
+![demo1](images/demo8.jpg)
+
 ## 界面展示
 
 - 资产管理
@@ -166,6 +185,9 @@ grant.sql & table.sql & procedure.sql
 
 ![demo1](images/demo5.jpg)
 
+- 数据库部署
+
+![demo1](images/demo7.jpg)
 
 ## 交流学习
 - QQ群 916746047
@@ -175,8 +197,6 @@ https://docs.qq.com/doc/DZHlBSGFGd1lpWUVS
 
 docker部署可参考：
 https://blog.csdn.net/gumengkai/article/details/106250548
-
-qq群文件中提供有完整的docker部署目录docker_dbmonitor供参考，理论上可以直接使用，部署用linux服务器内存不应小于4G
 
 Copyright © 2019 DB monitor
 
