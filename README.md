@@ -148,14 +148,29 @@ web日志： logs/django-web.log
 
 grant.sql & table.sql & procedure.sql
 
-#### 9. 访问地址
+#### 9. 数据库部署
+--Oracle数据库部署(仅支持19c版本)
+
+若要使用"数据库部署"的功能，需要手工下载数据库安装包并拷贝到utils/oracle_rac_install/目录中。
+
+LINUX.X64_193000_grid_home.zip --安装集群需要，只安装单实例则不需要
+
+LINUX.X64_193000_db_home.zip
+
+注：安装前需要提前准备的
+1. 配置yum源
+2. 网卡配置(rac安装)，包括private,public网络配置
+3. 服务器的配置应满足官方安装要求，如物理内存、磁盘空间、swap，自动化安装程序并不会对这些进行检查
+4. 共享磁盘配置(rac安装)，需要在完成step1 linux配置后进行共享存储配置，才可继续进行后续grid安装
+
+#### 10. 访问地址
 取决于自己的前端和后端端口配置，默认访问地址为
 
 ip:8000/admin --后端
 
 ip:8001 --前端
 
-#### 10. 系统设置
+#### 11. 系统设置
 如采集频率，可在django后台管理页面进行配置
 ![demo1](images/demo8.jpg)
 
