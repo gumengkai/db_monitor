@@ -21,7 +21,7 @@ class LinuxBase(object):
         ssh_client = paramiko.SSHClient()
         ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         try:
-            ssh_client.connect(**self.params)
+            ssh_client.connect(**self.params,allow_agent=False)
             t = paramiko.Transport((self.hostname,self.port))
             t.connect(username=self.username,password=self.password)
             sftp_client = paramiko.SFTPClient.from_transport(t)
@@ -57,7 +57,7 @@ class LinuxBase(object):
             if line != '':
                 yield (line,0)
 
-    def exec_command(self,command,ssh_client=None):
+    def exec_command(self,command,ssh_client=None): 
         try:
             if not ssh_client:
                 ssh_client, _ = self.connection()

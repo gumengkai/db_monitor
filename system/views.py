@@ -20,7 +20,7 @@ from system.tasks import OracleRacInstall
 from rest_framework.permissions import IsAuthenticated
 from utils.tools import mysql_django_query
 from rest_framework.renderers import JSONRenderer
-from system.tasks import oracle_rac_setup,oracle_rac_onenode_setup,oracle_onenode_setup
+from system.tasks import oracle_rac_setup,oracle_rac_onenode_setup,oracle_onenode_setup,mysql_setup
 
 logger = logging.getLogger('system')
 
@@ -248,6 +248,16 @@ class Menu(APIView):
                             'title': 'Oracle RAC One Node'
                         },
                         'component': 'system/oracle-rac-onenode-setup'
+                    },
+                    {
+                        'path': 'MySQL',
+                        'name': 'MySQL',
+                        'meta': {
+                            'access': ['system.view_alarminfo'],
+                            'icon': 'ios-menu',
+                            'title': 'MySQL'
+                        },
+                        'component': 'system/mysql-setup'
                     }
                 ]
             },
@@ -651,7 +661,7 @@ def ApiOracleRacOneNodeSetup(request):
     postBody = request.body
     json_result = json.loads(postBody)
     node_info = json_result
-    print(json_result)
+    # print(json_result)
     module = json_result['module']
     oracle_rac_onenode_setup.delay(node_info,module)
     # oracleracinstall = OracleRacInstall(rac_info, node_list)
@@ -663,9 +673,18 @@ def ApiOracleOneNodeSetup(request):
     postBody = request.body
     json_result = json.loads(postBody)
     node_info = json_result
-    print(json_result)
+    # print(json_result)
     module = json_result['module']
     oracle_onenode_setup.delay(node_info,module)
+    return HttpResponse('success!')
+
+@api_view(['POST'])
+def ApiMysqlSetup(request):
+    postBody = request.body
+    json_result = json.loads(postBody)
+    node_info = json_result
+    print(json_result)
+    mysql_setup.delay(node_info)
     return HttpResponse('success!')
 
 @api_view(['GET'])

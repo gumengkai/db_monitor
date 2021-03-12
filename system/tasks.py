@@ -3,6 +3,7 @@ from check.maincheck import checkall
 from utils.oracle_rac_install import OracleRacInstall
 from utils.oracle_rac_onenode_install import OracleRacOneNodeInstall
 from utils.oracle_onenode_install import OracleOneNodeInstall
+from utils.mysql_install import MysqlInstall
 
 
 @shared_task
@@ -27,3 +28,10 @@ def oracle_onenode_setup(node_info,module):
     print('Oracle One Node安装已启动！')
     oracle_onenode_install = OracleOneNodeInstall(node_info)
     oracle_onenode_install.do_onenode_install(module)
+
+
+@shared_task
+def mysql_setup(node_info):
+    print('MySQL安装已启动！')
+    mysql_install = MysqlInstall(node_info)
+    mysql_install.do_mysql_install()

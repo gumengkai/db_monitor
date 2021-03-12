@@ -1,160 +1,116 @@
-# encoding: utf-8
+# encoding： utf-8
 
-import configparser
-import os
 from utils.linux_base import LinuxBase
-log_type = 'MySQL部署'
+from utils.tools import now_local
+from utils.tools import mysql_exec,mysql_query,now,get_memtotal
+import os
+import configparser
 
-# mysql目录
-def get_dir_for_mysql(mysql_base, port):
-    mysql_home = '%s/my%s' % (mysql_base, port)
-    mysql_run = '%s/run' % mysql_home
-    mysql_tmp = '%s/tmp' % mysql_home
-    mysql_log = '%s/log' % mysql_home
-    mysql_binlog = '%s/log/binlog' % mysql_home
-    mysql_iblog = '%s/log/iblog' % mysql_home
+class MysqlInstall():
+    def __init__(self, node_info):
+        self.node_info = node_info
+        self.local_path = os.getcwd() + '/utils/mysql_install/'
+        self.soft_path = {
+            'MySQL5.7': 'mysql-5.7.33-linux-glibc2.12-x86_64.tar.gz'
+        }
 
-    return (mysql_home, mysql_run,mysql_tmp, mysql_log, mysql_binlog,mysql_iblog)
+    def clear_log(self):
+        sql = 'truncate table setup_log'
+        mysql_exec(sql,)
+
+    def log(self,log_content):
+        log_level = 'info'
+        log_type = 'MySQL安装'
+        current_time = now_local()
+        print('{}: {}'.format(current_time,log_content))
+        sql = "insert into setup_log(log_type,log_time,log_level,log_content)" \
+              "values(%s,%s,%s,%s)"
+        values = (log_type,current_time,log_level,log_content)
+        mysql_exec(sql, values)
+    
+    def linux_config(self,linux_conn,linux_params):
+        cmd_list = [
+            'systemctl stop firewalld',
+            'systemctl disable firewalld',
+            "sed -i 's/SELINUX=enabled/SELINUX=disabled/g' /etc/selinux/config ", #关闭防火墙，selinux
+            'move /etc/my.cnf /etc/my.cnfbak', #移除旧的MySQL参数文件
+            'yum search libaio',
+            'yum install libaio', #安装libaio包
+            'userdel -r mysql',
+            'groupadd mysql',
+            'useradd -g mysql -G mysql mysql',
+            "echo 'mysql:mysqld'|chpasswd", #创建MySQL用户
+            ]
+
+        res = [LinuxBase(linux_params).exec_command_res(cmd, linux_conn) for cmd in cmd_list]
+
+    def create_mysql_dir(self,linux_conn,linux_params):
+        mysql_path = self.node_info['mysql_path']
+        data_path = self.node_info['data_path']
+        mysql_run = '{}/run' .format(mysql_path)
+        mysql_tmp = '{}/tmp'.format(mysql_path)
+        mysql_undo = '{}/undo'.format(mysql_path)
+        dirs = (mysql_path,data_path,mysql_run,mysql_tmp,mysql_undo)
+        cmd_list = ['mkdir -p {}'.format(dir) for dir in dirs]
+
+        res = [LinuxBase(linux_params).exec_command_res(cmd, linux_conn) for cmd in cmd_list]
+    
+    def generate_mysql_cnf(self):
+        mysql_path = self.node_info['mysql_path']
+        data_path = self.node_info['data_path']
+        socket = '{}/run/mysql.sock'.format(self.node_info['mysql_path'])
+        slow_query_log_file = '{}/slow.log'.format(data_path)
+        log_error = '{}/error.log'.format(data_path)
+        log_bin = '{}/mybinlog'.format(data_path)
+        innodb_undo_directory = '{}/undolog'.format(data_path)
+
+        # innodb buffer pool大小设置为物理内存*0.7
+        memory_size = float(self.node_info['memory'])
+        innodb_buffer_pool_size = str(memory_size*0.7) + 'G'
+
+        # 处理配置文件
+        print(self.node_info['version'])
+        cnf = '{}my.cnf.template.5.7'.format(self.local_path) if self.node_info['version'] == 'MYSQL5.7' else '{}my.cnf.template.8.0'.format(self.local_path)
+        print(cnf)
+        my_cnf = configparser.ConfigParser()
+        my_cnf.read(cnf)
+        my_cnf.set('client','socket',socket)
+        my_cnf.set('mysqld','basedir',mysql_path)
+        my_cnf.set('mysqld','datadir',data_path)
+        my_cnf.set('mysqld','socket',socket)
+        my_cnf.set('mysqld','slow_query_log_file',slow_query_log_file)
+        my_cnf.set('mysqld','log-error',log_error)
+        my_cnf.set('mysqld','log-bin',log_bin)
+        my_cnf.set('mysqld','innodb_buffer_pool_size',innodb_buffer_pool_size)
+        my_cnf.set('mysqld','innodb_undo_directory',innodb_undo_directory)
+        with open("temp.conf","w+") as f:
+                my_cnf.write(f)
 
 
-def create_home_dir(linux_params,linux_conn,port,data_path,mysql_base):
-    # 创建MySQL目录
-    dirs = get_dir_for_mysql(mysql_base,port)
-    for dir in dirs:
-        cmd = 'mkdir -p %s' %dir
-        LinuxBase(linux_params).exec_command(cmd,linux_conn)
-        print('创建目录%s！'%dir)
-    # 创建数据目录
-    datadir = '%s/my%s' %(data_path,port)
-    cmd = 'mkdir -p %s' %datadir
-    LinuxBase(linux_params).exec_command(cmd,linux_conn)
-    print( '创建目录%s！' % datadir)
-    print( '创建目录完成！')
+    def do_mysql_install(self ):
+        linux_params = {
+            'hostname': self.node_info['ip'],
+            'port': 22,
+            'username': 'root',
+            'password': self.node_info['password']
+        }
+        linux_conn, _ = LinuxBase(linux_params).connection()
+        self.linux_config(linux_conn,linux_params)
+        self.create_mysql_dir(linux_conn,linux_params)
+        self.generate_mysql_cnf()
 
 
-def read_cnf_template():
-    conf_template_dir = os.getcwd()
-    print(conf_template_dir)
-    filename = conf_template_dir + '/mysql_install/my.cnf_template'
-    parser = configparser.ConfigParser(allow_no_value=True)
-    parser.read(filename)
-    for section in parser.sections():
-        for param_name in parser.options(section):
-            param_val = parser.get(section, param_name)
-    return parser
 
-def gen_server_id(ip, port):
-    return int("".join(ip.split('.')[-2:]) + str(port))
 
-def gen_conf_for_instance(host, port, data_path,mysql_base):
-    mysql_home = '%s/my%s' % (mysql_base, port)
-    data_home = '%s/my%s' % (data_path, port)
-
-    return {
-        'basedir': mysql_home,
-        'port': port,
-        'pid_file': '%s/run/mysql.pid' % mysql_home,
-        'datadir': data_home,
-        'tmpdir': '%s/tmp' % mysql_home,
-        'socket': '%s/run/mysql.sock' % mysql_home,
-        'log-bin': '%s/log/binlog/binlog' % mysql_home,
-        'log_error': '%s/log/error.log' % mysql_home,
-        'relay_log': '%s/log/relaylog.log' % mysql_home,
-        'relay_log_info_file': '%s/log/relay-log.info' % mysql_home,
-        'relay_log_index': '%s/log/relay.index' % mysql_home,
-        'slave_load_tmpdir': '%s/tmp' % mysql_home,
-        'slow_query_log_file': '%s/log/slow.log' % mysql_home,
-        'innodb_data_home_dir': '%s/log/iblog' % mysql_home,
-        'innodb_log_group_home_dir': '%s/log/iblog' % mysql_home,
-        'server-id': gen_server_id(host, port)
+if __name__ == '__main__':
+    node_info = {
+        'node_ip': '192.168.48.51',
+        'hostname': 'cispdg',
+        'dbname': 'cispcdb',
+        'pdbname': 'cisp',
+        'password': 'oracle',
     }
 
-def generate_conf(linux_params,port, data_path, mysql_base, mysql_home, extra_params):
-    """
-    :param conf_dict, a dict
-    :return:
-    """
-    mycnf = 'my.cnf_new'
-    conf_tmpl = read_cnf_template()
-    conf_dict = gen_conf_for_instance(linux_params['hostname'], port, data_path, mysql_base)
-
-    if not conf_tmpl.has_section('mysqld'):
-        conf_tmpl.add_section('mysqld')
-
-    for param_name, param_value in conf_dict.items():
-        conf_tmpl.set('mysqld', param_name, str(param_value))
-
-    for param in extra_params:
-        param_name = param['param_name']
-        param_value = param['param_value']
-        conf_tmpl.set('mysqld', param_name, param_value)
-
-    with open(mycnf, 'w') as cnf:
-        conf_tmpl.write(cnf)
-    print('生成配置文件%s！' %mycnf)
-    LinuxBase(linux_params).sftp_upload_file(mycnf,'%s/my.cnf' %mysql_home)
-    print(mysql_home)
-    print('上传配置文件至%s/my.cnf！' %mysql_home)
-
-
-def install_default_database(linux_params,linux_conn,data_path,mysql_base,port,mysql_home):
-    # 上传安装包，解压缩
-    soft_dir = os.getcwd() + '/mysql_install'
-    soft_name = 'mysql-5.7.24-linux-glibc2.12-x86_64.tar.gz'
-    local_soft = '%s/%s' %(soft_dir,soft_name)
-    remote_loc = '%s/%s' %(mysql_base,soft_name)
-    LinuxBase(linux_params).sftp_upload_file(local_soft,remote_loc)
-    print('上传安装文件至%s！' %remote_loc)
-    cmd = 'tar -xzvf %s -C %s' %(remote_loc,mysql_base)
-    print(cmd)
-    LinuxBase(linux_params).exec_command(cmd,linux_conn)
-    print('解压缩完成！')
-    cmd = 'mv %s/mysql*/* %s' %(mysql_base,mysql_home)
-    print(cmd)
-    # LinuxBase(linux_params).exec_command(cmd,linux_conn)
-    # 建用户，授权
-    cmd = '/usr/bin/groupadd mysql'
-    # LinuxBase(linux_params).exec_command(cmd,linux_conn)
-    cmd = '/usr/bin/useradd -d /home/mysql -g mysql -m mysql'
-    # LinuxBase(linux_params).exec_command(cmd)
-    print('创建MySQL用户成功！')
-    cmd = 'chown -R mysql:mysql %s' % mysql_base
-    # LinuxBase(linux_params).exec_command(cmd)
-    cmd = 'chown -R mysql:mysql %s/my%s' %(data_path,port)
-    LinuxBase(linux_params).exec_command(cmd,linux_conn)
-    # 初始化MySQL
-    cmd = '%s/bin/mysqld --defaults-file=%s/my.cnf --initialize-insecure --user=mysql' %(mysql_home,mysql_home)
-    # LinuxBase(linux_params).exec_command(cmd,linux_conn)
-    print('初始化MySQL数据库成功！')
-    # 启动MySQL数据库
-    cmd = '%s/bin/mysqld_safe --defaults-file=%s/my.cnf --user=mysql &' %(mysql_home,mysql_home)
-    print("创建MySQL：%s:%s成功，初始密码为空，请运行%s启动MySQL数据库！" %(linux_params['hostname'],port,cmd))
-
-
-def mysql_install(linux_params,linux_conn,data_path,mysql_base,port):
-    extra_params = ''
-    mysql_home = '/%s/my%s' %(mysql_base,port)
-    print(mysql_home)
-    # 1. 创建目录
-    print('开始创建目录！')
-    create_home_dir(linux_params,linux_conn,port,data_path,mysql_base)
-    # 2. 生成配置文件
-    print('生成配置文件！')
-    generate_conf(linux_params,port,data_path,mysql_base,mysql_home,extra_params)
-    # 3. 初始化数据库
-    install_default_database(linux_params,linux_conn,data_path,mysql_base,port,mysql_home)
-
-if __name__  == '__main__':
-    data_path = '/data'
-    mysql_base = '/u01'
-    port = 3306
-    linux_params = {
-        'hostname': '192.168.48.60',
-        'port': 22,
-        'username': 'root',
-        'password': 'oracle'
-    }
-    linux_conn,_ = LinuxBase(linux_params).connection()
-
-    mysql_install(linux_params,linux_conn,data_path,mysql_base,port)
-
+    oracleracinstall = OracleOneNodeInstall(node_info)
+    # oracleracinstall.clear_rac()
+    oracleracinstall.do_rac_install('linux')

@@ -29,7 +29,7 @@ class OracleOneNodeInstall():
 
     def log(self,log_content):
         log_level = 'info'
-        log_type = 'Oracle RAC安装'
+        log_type = 'Oracle One Node安装'
         current_time = now_local()
         print('{}: {}'.format(current_time,log_content))
         sql = "insert into setup_log(log_type,log_time,log_level,log_content)" \

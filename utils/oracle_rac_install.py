@@ -111,8 +111,8 @@ class OracleRacInstall():
         LinuxBase(linux_params).sftp_upload_file('{}oracle-database-preinstall-19c.conf'.format(self.local_path),
                                                  '/tmp/oracle-database-preinstall-19c.conf')
 
-    def get_shm_config(self):
-        memtotal = get_memtotal(self.node_info['node_ip'],self.node_info['node_password'])
+    def get_shm_config(self,node1):
+        memtotal = get_memtotal(node1['ip'],node1['password'])
         # 物理内存-1G 单位为字节
         shmmax = (float(memtotal)/1024/1024-1)*1024*1024*1024
         # 物理内存-1G 单位为page 
@@ -185,7 +185,7 @@ class OracleRacInstall():
         ])
 
         # 内核参数设置
-        shmmax,shmall = self.get_shm_config()
+        shmmax,shmall = self.get_shm_config(node1)
         cmd_list.extend([
             'mv /tmp/97-oracle-database-sysctl.conf /etc/sysctl.d/97-oracle-database-sysctl.conf',
             "sed -i 's/NODE_SHMMAX/{}/g' /etc/sysctl.d/97-oracle-database-sysctl.conf".format(shmmax),

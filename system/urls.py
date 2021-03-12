@@ -15,5 +15,6 @@ urlpatterns = [
     path('api/oracle-rac-setup', views.ApiOracleRacSetup),
     path('api/oracle-rac-onenode-setup', views.ApiOracleRacOneNodeSetup),
     path('api/oracle-onenode-setup', views.ApiOracleOneNodeSetup),
+    path('api/mysql-setup', views.ApiMysqlSetup),
     path('api/setup-log', views.ApiSetupLog),
 ]
