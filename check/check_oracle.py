@@ -171,7 +171,7 @@ def check_oracle(tags,oracle_params):
         clear_table(tags, 'oracle_undo_tablespace')
         undotbsinfo_list = get_undo_tablespace(db_conn)
         for undotbsinfo in undotbsinfo_list:
-            undotablespace_name, total_size, used_size, percent_used = undotbsinfo
+            undotablespace_name, used_size, total_size, percent_used = undotbsinfo
             insert_data_sql = "insert into oracle_undo_tablespace(tags,host,port,service_name,undotablespace_name,total_size,used_size," \
                               "percent_used,check_time)" \
                               "values('{tags}','{host}',{port},'{service_name}','{undotablespace_name}',{total_size}," \
