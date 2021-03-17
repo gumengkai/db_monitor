@@ -65,9 +65,9 @@ def check_oracle(tags,oracle_params):
             pga_target_size, pga_used_size, pga_used_percent = pga(db_conn)
         else:
             pga_target_size, pga_used_size, pga_used_percent = (0,0,0)
-        if database_role == 'PYSICAL STANDBY DATABASE':
-            adg_trans_lag, adg_trans_value = adg_trans(db_conn)
-            adg_apply_lag, adg_apply_value = adg_apply(db_conn)
+        if database_role == 'PHYSICAL STANDBY':
+            adg_trans_lag, adg_trans_value = adg_trans(db_conn_cdb)
+            adg_apply_lag, adg_apply_value = adg_apply(db_conn_cdb)
         else:
             adg_trans_lag = 'None'
             adg_apply_lag = 'None'
@@ -191,7 +191,7 @@ def check_oracle(tags,oracle_params):
             mysql_exec(insert_sql)
 
         # 后台日志解析
-        get_oracle_alert(tags,db_conn,oracle_params,linux_params)
+        # get_oracle_alert(tags,db_conn,oracle_params,linux_params)
 
         db_conn.close()
     else:

@@ -111,12 +111,12 @@ def asm(db_conn):
 # 获取adg传输延迟
 def adg_trans(db_conn):
     sql = "select value,substr(value,2,2)*24*3600+substr(value,5,2)*3600+substr(value,8,2)*60+substr(value,11,2) from v$dataguard_stats where name='transport lag'"
-    return query_all(db_conn,sql)
+    return query_one(db_conn,sql)
 
 # 获取adg应用延迟
 def adg_apply(db_conn):
     sql = "select value,substr(value,2,2)*24*3600+substr(value,5,2)*3600+substr(value,8,2)*60+substr(value,11,2) from v$dataguard_stats where name='apply lag'"
-    return query_all(db_conn,sql)
+    return query_one(db_conn,sql)
 
 # 获取表空间使用率
 def tablespace(db_conn):
@@ -213,7 +213,7 @@ def get_tab_stats(db_conn):
   from (select t1.owner,
                t1.table_name,
                t1.num_rows,
-               ROUND((T2.inserts + T2.updates + T2.deletes) / T1.num_rows * 100,
+               ROUND((T2.inserts + T2.updates + T2.deletes) / decode(T1.num_rows,0,1,T1.num_rows) * 100,
                      2) change_pct,
                T1.last_analyzed
           from dba_tables t1, dba_tab_modifications t2
