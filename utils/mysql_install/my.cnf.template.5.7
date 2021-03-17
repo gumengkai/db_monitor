@@ -1,5 +1,5 @@
 [client]
-port	= PORT
+port	= MYSQL_PORT
 socket	= MYSQL_PATH/run/mysql.sock
 
 [mysql]
@@ -8,7 +8,7 @@ no-auto-rehash
 
 [mysqld]
 user	= mysql
-port	= PORT
+port	= MYSQL_PORT
 basedir	= MYSQL_PATH
 datadir	= DATA_PATH
 socket	= MYSQL_PATH/run/mysql.sock
@@ -46,7 +46,7 @@ log_throttle_queries_not_using_indexes = 60
 min_examined_row_limit = 100
 log_slow_admin_statements = 1
 log_slow_slave_statements = 1
-server-id = PORT
+server-id = MYSQL_PORT
 log-bin = DATA_PATH/mybinlog
 sync_binlog = 1
 binlog_cache_size = 4M

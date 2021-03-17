@@ -10,8 +10,13 @@ class MysqlInstall():
     def __init__(self, node_info):
         self.node_info = node_info
         self.local_path = os.getcwd() + '/utils/mysql_install/'
-        self.soft_path = {
-            'MySQL5.7': 'mysql-5.7.33-linux-glibc2.12-x86_64.tar.gz'
+        self.mysql_soft_config = {
+            'MySQL5.7': 'mysql-5.7.33-linux-glibc2.12-x86_64.tar.gz',
+            'MySQL8.0': 'mysql-8.0.23-linux-glibc2.12-x86_64.tar.xz'
+        }
+        self.mysql_template_config = {
+            'MySQL5.7': 'my.cnf.template.5.7',
+            'MySQL8.0': 'my.cnf.template.8.0'
         }
 
     def clear_log(self):
@@ -29,6 +34,7 @@ class MysqlInstall():
         mysql_exec(sql, values)
     
     def linux_config(self,linux_conn,linux_params):
+        self.log('开始进行linux基础配置..')
         cmd_list = [
             'systemctl stop firewalld',
             'systemctl disable firewalld',
@@ -43,50 +49,84 @@ class MysqlInstall():
             ]
 
         res = [LinuxBase(linux_params).exec_command_res(cmd, linux_conn) for cmd in cmd_list]
+        self.log('{}：linux操作系统配置完成'.format(self.node_info['ip']))
 
     def create_mysql_dir(self,linux_conn,linux_params):
+        self.log('开始创建MySQL目录..')
         mysql_path = self.node_info['mysql_path']
         data_path = self.node_info['data_path']
         mysql_run = '{}/run' .format(mysql_path)
         mysql_tmp = '{}/tmp'.format(mysql_path)
         mysql_undo = '{}/undo'.format(mysql_path)
         dirs = (mysql_path,data_path,mysql_run,mysql_tmp,mysql_undo)
-        cmd_list = ['mkdir -p {}'.format(dir) for dir in dirs]
+        cmd_list = [
+            'rm -rf  {}'.format(mysql_path),
+            'rm -rf  {}'.format(data_path)
+            ]
+
+        cmd_list.extend(['mkdir -p {}'.format(dir) for dir in dirs])
 
         res = [LinuxBase(linux_params).exec_command_res(cmd, linux_conn) for cmd in cmd_list]
+        self.log('{}：创建目录完成'.format(self.node_info['ip']))
+
     
-    def generate_mysql_cnf(self):
+    def generate_mysql_cnf(self,linux_conn,linux_params):
+        self.log('开始生成MySQL配置文件..')
         mysql_path = self.node_info['mysql_path']
         data_path = self.node_info['data_path']
-        socket = '{}/run/mysql.sock'.format(self.node_info['mysql_path'])
-        slow_query_log_file = '{}/slow.log'.format(data_path)
-        log_error = '{}/error.log'.format(data_path)
-        log_bin = '{}/mybinlog'.format(data_path)
-        innodb_undo_directory = '{}/undolog'.format(data_path)
+        mysql_port = self.node_info['port']
 
         # innodb buffer pool大小设置为物理内存*0.7
         memory_size = float(self.node_info['memory'])
-        innodb_buffer_pool_size = str(memory_size*0.7) + 'G'
+        innodb_buffer_pool_size = str(int(memory_size*0.7*1024)) + 'M'
 
-        # 处理配置文件
-        print(self.node_info['version'])
-        cnf = '{}my.cnf.template.5.7'.format(self.local_path) if self.node_info['version'] == 'MYSQL5.7' else '{}my.cnf.template.8.0'.format(self.local_path)
-        print(cnf)
-        my_cnf = configparser.ConfigParser()
-        my_cnf.read(cnf)
-        my_cnf.set('client','socket',socket)
-        my_cnf.set('mysqld','basedir',mysql_path)
-        my_cnf.set('mysqld','datadir',data_path)
-        my_cnf.set('mysqld','socket',socket)
-        my_cnf.set('mysqld','slow_query_log_file',slow_query_log_file)
-        my_cnf.set('mysqld','log-error',log_error)
-        my_cnf.set('mysqld','log-bin',log_bin)
-        my_cnf.set('mysqld','innodb_buffer_pool_size',innodb_buffer_pool_size)
-        my_cnf.set('mysqld','innodb_undo_directory',innodb_undo_directory)
-        with open("temp.conf","w+") as f:
-                my_cnf.write(f)
+        cnf_template = '{}my.cnf.template.5.7'.format(self.local_path) if self.node_info['version'] == 'MySQL5.7' else '{}my.cnf.template.8.0'.format(self.local_path)
+        LinuxBase(linux_params).sftp_upload_file(cnf_template, '/tmp/my.cnf')
+        cmd_list = [
+            'mv /tmp/my.cnf {}/my.cnf'.format(mysql_path),
+            "sed -i 's#MYSQL_PATH#{}#g' {}/my.cnf".format(mysql_path,mysql_path),
+            "sed -i 's#DATA_PATH#{}#g' {}/my.cnf".format(data_path,mysql_path),
+            "sed -i 's/INNODB_SIZE/{}/g' {}/my.cnf".format(innodb_buffer_pool_size,mysql_path),
+            "sed -i 's/MYSQL_PORT/{}/g' {}/my.cnf".format(mysql_port,mysql_path)
+        ]
+        res = [LinuxBase(linux_params).exec_command_res(cmd, linux_conn) for cmd in cmd_list]
+        self.log('{}：MySQL配置文件生成完成'.format(self.node_info['ip']))
+    
+    def mysql_initialize(self,linux_conn,linux_params):
+        mysql_path = self.node_info['mysql_path']
+        data_path = self.node_info['data_path']
 
+        mysql_package = self.mysql_soft_config[self.node_info['version']]
+        # 上传
+        self.log('开始上传MySQL安装包：{}..'.format(mysql_package))
+        LinuxBase(linux_params).sftp_upload_file('{}{}'.format(self.local_path,mysql_package), '/tmp/{}'.format(mysql_package))
+        self.log('{}：MySQL安装包上传完成'.format(self.node_info['ip']))
 
+        # 解压
+        self.log('开始解压MySQL安装包..')
+        cmd = 'tar xvf /tmp/{} -C {}/'.format(mysql_package,mysql_path)
+        LinuxBase(linux_params).exec_command_res(cmd,linux_conn)
+        self.log('{}：MySQL安装包解压完成'.format(self.node_info['ip']))
+        # 授权
+        cmd_list = [
+            'mv {}/mysql*/* {}'.format(mysql_path,mysql_path),
+            'chown -R mysql:mysql {}'.format(mysql_path),
+            'chmod -R 775 {}'.format(mysql_path),
+            'chown -R mysql:mysql {}'.format(data_path),
+            'chmod -R 775 {}'.format(data_path),
+        ]
+        res = [LinuxBase(linux_params).exec_command_res(cmd, linux_conn) for cmd in cmd_list]
+        self.log('开始初始化MySQL..')
+        # 初始化
+        cmd = '{}/bin/mysqld --defaults-file={}/my.cnf --initialize-insecure --user=mysql'.format(mysql_path,mysql_path)
+        LinuxBase(linux_params).exec_command_res(cmd,linux_conn)
+        self.log('{}：MySQL初始化完成'.format(self.node_info['ip']))
+        self.log('请使用MySQL用户(默认密码mysqld)启动MySQL数据库：{}/bin/mysqld_safe --defaults-file={}/my.cnf --user=mysql &'.format(mysql_path,mysql_path))
+        # 启动
+        # cmd = '{}/bin/mysqld_safe --defaults-file={}/my.cnf --user=mysql &'.format(mysql_path,mysql_path)
+        # LinuxBase(linux_params).exec_command_res(cmd,linux_conn)
+
+        
     def do_mysql_install(self ):
         linux_params = {
             'hostname': self.node_info['ip'],
@@ -94,12 +134,12 @@ class MysqlInstall():
             'username': 'root',
             'password': self.node_info['password']
         }
+        self.clear_log()
         linux_conn, _ = LinuxBase(linux_params).connection()
         self.linux_config(linux_conn,linux_params)
         self.create_mysql_dir(linux_conn,linux_params)
-        self.generate_mysql_cnf()
-
-
+        self.generate_mysql_cnf(linux_conn,linux_params)
+        self.mysql_initialize(linux_conn,linux_params)
 
 
 if __name__ == '__main__':

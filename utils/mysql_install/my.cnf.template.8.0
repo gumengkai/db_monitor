@@ -1,17 +1,6 @@
-#
-## my.cnf for MySQL 5.7/8.0
-## autoor: yejr(yejinrong@zhishutang.com, http://imysql.com, QQ: 4700963)
-##
-## 叶金荣(yejr)
-## 靠谱优质的在线培训品牌知数堂培训(http://zhishuedu.com)联合创始人
-## 新浪微博: @叶金荣, 微信公众：老叶茶馆(imysql_wx)
-## QQ群: 650149401
-## 注意：个别建议可能需要根据实际情况作调整，请自行判断或联系我，本人不对这些建议结果负相应责任
-## 本配置文件主要适用于MySQL 5.7/8.0版本
-#
 [client]
-port	= 3306
-socket	= /u01/my3306/run/mysql.sock
+port	= MYSQL_PORT
+socket	= MYSQL_PATH/run/mysql.sock
 
 [mysql]
 prompt="\u@mysqldb \R:\m:\s [\d]> "
@@ -19,10 +8,10 @@ no-auto-rehash
 
 [mysqld]
 user	= mysql
-port	= 3306
-basedir	= /u01/my3306
-datadir	= /data/my3306
-socket	= /u01/my3306/run/mysql.sock
+port	= MYSQL_PORT
+basedir	= MYSQL_PATH
+datadir	= DATA_PATH
+socket	= MYSQL_PATH/run/mysql.sock
 pid-file = mysqldb.pid
 character-set-server = utf8mb4
 skip_name_resolve = 1
@@ -32,7 +21,7 @@ default_time_zone = "+8:00"
 
 open_files_limit    = 65535
 back_log = 1024
-max_connections = 512
+max_connections = 3000
 max_connect_errors = 1000000
 table_open_cache = 1024
 table_definition_cache = 1024
@@ -49,16 +38,16 @@ tmp_table_size = 32M
 max_heap_table_size = 32M
 slow_query_log = 1
 log_timestamps = SYSTEM
-slow_query_log_file = /data/my3306/slow.log
-log-error = /data/my3306/error.log
+slow_query_log_file = DATA_PATH/slow.log
+log-error = DATA_PATH/error.log
 long_query_time = 0.1
 log_queries_not_using_indexes =1
 log_throttle_queries_not_using_indexes = 60
 min_examined_row_limit = 100
 log_slow_admin_statements = 1
 log_slow_slave_statements = 1
-server-id = 3306
-log-bin = /data/my3306/mybinlog
+server-id = MYSQL_PORT
+log-bin = DATA_PATH/mybinlog
 sync_binlog = 1
 binlog_cache_size = 4M
 max_binlog_cache_size = 2G
@@ -92,7 +81,7 @@ innodb_spin_wait_delay = 30
 
 transaction_isolation = REPEATABLE-READ
 #innodb_additional_mem_pool_size = 16M
-innodb_buffer_pool_size = 717M
+innodb_buffer_pool_size = INNODB_SIZE
 innodb_buffer_pool_instances = 4
 innodb_buffer_pool_load_at_startup = 1
 innodb_buffer_pool_dump_at_shutdown = 1
@@ -102,7 +91,7 @@ innodb_log_buffer_size = 32M
 innodb_log_file_size = 2G
 innodb_log_files_in_group = 2
 innodb_max_undo_log_size = 4G
-innodb_undo_directory = /data/my3306/undolog
+innodb_undo_directory = DATA_PATH/undolog
 innodb_undo_tablespaces = 95
 
 # 根据您的服务器IOPS能力适当调整
