@@ -27,7 +27,7 @@ class LinuxBase(object):
             sftp_client = paramiko.SFTPClient.from_transport(t)
             return ssh_client,sftp_client
         except Exception as e:
-            print("linux connect error")
+            print("linux connect error：{}".format(e))
             return(None,None)
     # read all of file content
     def readfile(self,file,seek=0):
