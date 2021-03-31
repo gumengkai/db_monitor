@@ -525,7 +525,7 @@ class LinuxStat(LinuxBase):
 
     def get_diskfree(self):
         ret = []
-        command = 'df -k'
+        command = 'df -kP'
         res = super().exec_command(command,self.conn)
         disk_list = [line.split() for line in res]
         disk_list.pop(0)
