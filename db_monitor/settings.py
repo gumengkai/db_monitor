@@ -285,3 +285,7 @@ EMAIL_PORT = 25
 EMAIL_HOST_USER = '*******'
 EMAIL_HOST_PASSWORD = '*********'
 EMAIL_TO_USER = ['1782365880@qq.com','gumengkai@hotmail.com']
+
+# send dingding
+IS_SEND_DING_MSG = 0
+DING_WEBHOOK = '*********'

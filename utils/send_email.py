@@ -4,7 +4,6 @@ import os
 from django.core.mail import send_mail
 from django.conf import settings
 
-
 os.environ['DJANGO_SETTINGS_MODULE'] = 'db_monitor.settings'
 
 def my_send_email(header,content):

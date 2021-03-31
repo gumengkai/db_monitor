@@ -103,6 +103,11 @@ EMAIL_HOST_PASSWORD = '*********'   #此处为客户端授权码，不是邮箱�
 
 EMAIL_TO_USER = ['1782365880@qq.com','gumengkai@hotmail.com'] # 发送邮件列表,参考格式设置
 
+--钉钉告警配置
+
+IS_SEND_DING_MSG = 0  #是否发送钉钉告警 0：不发送 1：发送
+
+DING_WEBHOOK = '**********' #webhook，从钉钉获取
 
 ##### 创建数据库
 python manage.py makemigrations
