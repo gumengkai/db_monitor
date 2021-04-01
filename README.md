@@ -51,27 +51,27 @@ docker(懒人详细版)部署可参考，提供所有安装文件，可以直接
 https://stuxidianeducn-my.sharepoint.com/:f:/g/personal/gumengkai_stu_xidian_edu_cn/EljbazMtQtJKhPKsuY9ZljgBjp7ujQHxPfj6-Hk0dnhyxQ?e=8JOrTk
 
 ## 安装部署
-#### 1. 安装python3.6(略)
+### 1. 安装python3.6(略)
 
-#### 2. 安装mysql5.7(略)
+### 2. 安装mysql5.7(略)
 
 注意字符集：utf-8
 
 create database db_monitor; 
 
-#### 3. 安装redis3.2(略)
+### 3. 安装redis3.2(略)
 
-#### 4. 安装oracle instant client(略)
+### 4. 安装oracle instant client(略)
 
-#### 5. 项目配置
+### 5. 项目配置
 
-##### 下载源代码
+#### 下载源代码
 git clone https://github.com/gumengkai/db_monitor
 
-##### 安装依赖包
+#### 安装依赖包
 pip install -r requirements.txt
 
-##### settings配置
+#### settings配置
 --MySQL数据库：
 
 DATABASES = {  
@@ -91,7 +91,7 @@ CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
 
 CELERY_BROKER_URL = 'redis://localhost:6379/2'
 
---邮件配置：
+--邮件告警配置：
 
 IS_SEND_EAMIL = 0 #是否发送告警邮件，0：不发送 1：发送
 
@@ -113,20 +113,20 @@ IS_SEND_DING_MSG = 0  #是否发送钉钉告警 0：不发送 1：发送
 
 DING_WEBHOOK = '**********' #webhook，从钉钉获取
 
-##### 创建数据库
+#### 创建数据库
 python manage.py makemigrations
 
 python manage.py migrate
 
 python manage.py createsuperuser(创建登录用户)
 
-##### 执行数据库脚本
+#### 执行数据库脚本
 
 @install/initdata.sql
 
 初始化脚本包含celery初始数据和admin初始用户(密码为111111)
 
-#### 6. 启动
+### 6. 启动/停止
 python manage.py runserver 0.0.0.0:8000 #建议使用固定IP地址启动
 
 celery –A db_monitor worker –l info
@@ -149,15 +149,15 @@ web日志： logs/django-web.log
 
 注：使用shell脚本启停时如遇到“/r command not found”，为linux与windows换行符格式差异导致，在Linux凭条可以在vim下执行:set ff=unix解决
 
-#### 7. 前端配置
+### 7. 前端配置
 请参考：[db_monitor_vue](https://github.com/gumengkai/db_monitor_vue)
 
-#### 8. oracle数据库监控
+### 8. oracle数据库监控
 对Oracle数据库监控，请在被监控端建立用户，并执行install/sqlscripts(forOracle)中的脚本
 
 grant.sql & table.sql & procedure.sql
 
-#### 9. 数据库部署
+### 9. 数据库部署
 --Oracle数据库部署(仅支持19c版本)
 
 若要使用"数据库部署"的功能，需要手工下载数据库安装包并拷贝到utils/oracle_rac_install/目录中。
@@ -179,14 +179,14 @@ mysql-5.7.33-linux-glibc2.12-x86_64.tar.gz
 mysql-8.0.23-linux-glibc2.12-x86_64.tar.xz
 
 
-#### 10. 访问地址
+### 10. 访问地址
 取决于自己的前端和后端端口配置，默认访问地址为
 
 ip:8000/admin --后端
 
 ip:8001 --前端
 
-#### 11. 系统设置
+### 11. 系统设置
 如采集频率，可在django后台管理页面进行配置
 ![demo1](images/demo8.jpg)
 
