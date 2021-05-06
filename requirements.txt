@@ -24,7 +24,7 @@ djangorestframework-jwt==1.11.0
 idna==2.8
 importlib-metadata==0.23
 itypes==1.1.0
-Jinja2==2.10.1
+Jinja2==2.11.3
 kombu==4.6.6
 MarkupSafe==1.1.1
 more-itertools==7.2.0
