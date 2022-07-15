@@ -14,7 +14,7 @@ cx-Oracle==7.2.2
 Django==2.2.10
 django-bootstrap3==11.1.0
 django-celery-beat==1.5.0
-django-celery-results==1.1.2
+django-celery-results==2.4.0
 django-cors-headers==3.1.0
 django-filter==2.2.0
 django-rest-swagger==2.2.0
